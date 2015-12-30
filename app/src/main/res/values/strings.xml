@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Tuxedo3</string>
     <string name="action_settings">Settings</string>
+    <string name="subtitle">Classical Stations</string>
     
     <string-array name="Sites">
         <item>FUCK YOU123</item>
