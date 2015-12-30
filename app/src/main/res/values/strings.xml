@@ -3,7 +3,24 @@
     <string name="action_settings">Settings</string>
     
     <string-array name="Sites">
-        <item>Bitchin\' Classical</item>
+        <item>FUCK YOU123</item>
+        <item>FUCK Bitchin\' Classical</item>
+        <item>Suckass Classical</item>
+        <item>Mediocre Classical</item>
+        <item>Classy Classical</item>
+        <item>Kevin\'s Classical</item>
+        <item>Tim\'s Classical</item>
+        <item>Somebody\'s Classical</item>
+        <item>Strings and Brass</item>
+        <item>Tits and Ass</item>
+        <item>Snarky Stuff</item>
+        <item>Ruff Ruff Ruff</item>
+        <item>Another One</item>
+        <item>Last One</item>
+    </string-array>
+    <string-array name="Sites2">
+        <item>NEW PAGE</item>
+        <item>FUCK Bitchin\' Classical</item>
         <item>Suckass Classical</item>
         <item>Mediocre Classical</item>
         <item>Classy Classical</item>

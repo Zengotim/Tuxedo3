@@ -1,6 +1,7 @@
 package com.tk_squared.tuxedo3;
 
 import android.app.ListFragment;
+import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.os.Bundle;
