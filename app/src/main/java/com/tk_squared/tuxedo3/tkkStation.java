@@ -17,6 +17,11 @@ public class tkkStation {
 
     }
 
+    //I DID THIS!! TIM!!
+    public Uri getIconURI(){
+        return Uri.parse("http://www.tshirthell.com/favicon.ico");
+    }
+
     public tkkStation(String n, Uri u) {
         uri = u;
         name = n;

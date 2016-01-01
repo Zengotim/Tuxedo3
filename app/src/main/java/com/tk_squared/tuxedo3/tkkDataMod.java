@@ -13,7 +13,7 @@ import java.util.List;
 public class tkkDataMod {
 
     private static tkkDataMod instance = null;
-    private List<tkkStation> stations;
+    private ArrayList<tkkStation> stations;
 
     private tkkDataMod(){
         stations = new ArrayList<>();
@@ -38,11 +38,11 @@ public class tkkDataMod {
         return instance;
     }
 
-    public List<tkkStation> getStations(){
+    public ArrayList<tkkStation> getStations(){
         return stations;
     }
 
-    public void setStations(List<tkkStation> s) {
+    public void setStations(ArrayList<tkkStation> s) {
         if(stations != null){
             stations.clear();
         }
