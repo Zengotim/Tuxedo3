@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -61,6 +63,16 @@ public class TuxedoActivityFragment extends ListFragment {
         activity.setSupportActionBar(toolbar);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                callbacks.onStationSelected((tkkStation)getListAdapter().getItem(position));
+            }
+        });
+    }
+
     public class StationAdapter extends ArrayAdapter<tkkStation>{
 
         public StationAdapter(Context context, ArrayList<tkkStation> list){
@@ -84,13 +96,6 @@ public class TuxedoActivityFragment extends ListFragment {
 
             IconLoadTask setIcon = new IconLoadTask(view, position);
             setIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
-            //TODO: FIX THIS SHIT!
-            getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    callbacks.onStationSelected(station);
-                }
-            });
             return view;
         }
 
