@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 public class TuxedoActivityFragment extends ListFragment {
 
-    private Callbacks callbacks;
+    public Callbacks callbacks;
 
     public interface Callbacks{
         void onStationSelected(tkkStation station);
@@ -42,7 +42,6 @@ public class TuxedoActivityFragment extends ListFragment {
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
-        callbacks = (Callbacks) context;
     }
 
     @Override
@@ -56,7 +55,7 @@ public class TuxedoActivityFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         ArrayAdapter adapter = new StationAdapter(getActivity(), tkkDataMod.getInstance().getStations());
         setListAdapter(adapter);
-
+        callbacks = (Callbacks)getActivity();
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.subtitle);
         AppCompatActivity activity = (AppCompatActivity)getActivity();
@@ -68,7 +67,18 @@ public class TuxedoActivityFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                callbacks.onStationSelected((tkkStation)getListAdapter().getItem(position));
+                Log.i("item_click_listener", "OnItemClickListener called");
+                tkkStation station = (tkkStation) getListAdapter().getItem(position);
+                Log.i("variable_created", "station variable created");
+                if (station==null){Log.i("null_station", "station variable is null");}
+                if (callbacks==null){
+                    Log.i("null_callbacks", "callbacks variable is null");
+                    callbacks = (Callbacks)getActivity();
+                }
+                callbacks.onStationSelected(station);
+
+
+                Log.i("item_click_listener1", "OnItemClickListener done");
             }
         });
     }
@@ -113,7 +123,9 @@ public class TuxedoActivityFragment extends ListFragment {
                 try {
                     String iconURL = "http://www.google.com/favicon.ico";
                     Bitmap _icon = BitmapFactory.decodeStream((InputStream) new URL(iconURL).getContent());
-                    icon = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(_icon, 96, 96, false));
+                    if (_icon != null) {
+                        icon = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(_icon, 96, 96, false));
+                    }
                 }
                 catch(MalformedURLException e){
                     //do nothing

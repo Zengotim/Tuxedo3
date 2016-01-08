@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 /**
  * Created by Tim on 1/4/2016.
- *
+ * 'Cuz Tim rocks.
  */
 public class TuxedoWebViewFragment extends Fragment{
 
@@ -24,8 +24,11 @@ public class TuxedoWebViewFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //Inflate the main view
         View view = inflater.inflate(R.layout.fragment_webview, container, false);
+        //Also grab a reference to the WebView inner view
         WebView webview = (WebView) view.findViewById(R.id.webview_view);
+        //Setup the WebView
         webview.getSettings().setJavaScriptEnabled(true);
         webview.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
@@ -40,6 +43,7 @@ public class TuxedoWebViewFragment extends Fragment{
         });
         uri = Uri.parse(getArguments().getString("uri", null));
         webview.loadUrl(uri.toString());
+
         return view;
     }
 
