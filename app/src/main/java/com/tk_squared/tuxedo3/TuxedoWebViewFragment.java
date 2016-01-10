@@ -3,6 +3,8 @@ package com.tk_squared.tuxedo3;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +24,20 @@ public class TuxedoWebViewFragment extends Fragment{
     public TuxedoWebViewFragment(){}
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.webview_toolbar);
+        toolbar.setSubtitle(R.string.subtitle);
+        AppCompatActivity activity = (AppCompatActivity)getActivity();
+        activity.setSupportActionBar(toolbar);
+        activity.getSupportActionBar().setDisplayShowHomeEnabled(true);
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         //Inflate the main view
         View view = inflater.inflate(R.layout.fragment_webview, container, false);
         //Also grab a reference to the WebView inner view
