@@ -8,9 +8,10 @@ import android.widget.ImageView;
  * science bitches
  */
 public class tkkStation {
+    private long id;
     private Uri uri;
     private String name;
-    private ImageView imageView;
+    private Uri imageUri;
     private int index;
 
     public tkkStation(){
@@ -22,31 +23,38 @@ public class tkkStation {
         return Uri.parse("http://www.tshirthell.com/favicon.ico");
     }
 
-    public tkkStation(String n, Uri u) {
+    public tkkStation(long _id, String n, Uri u) {
+        id = _id;
         uri = u;
         name = n;
     }
 
-    public tkkStation(int idx, String n, Uri u) {
+    public tkkStation(int idx, long _id, String n, Uri u) {
+        id = _id;
         index = idx;
         uri = u;
         name = n;
     }
 
-    public tkkStation(int idx, ImageView i, String n, Uri u) {
+    public tkkStation(int idx, long _id, Uri iU, String n, Uri u) {
+        id = _id;
         index = idx;
         uri = u;
         name = n;
-        imageView = i;
+        imageUri = iU;
     }
 
-    public ImageView getImageView(){
-        return imageView;
+    public Uri getImageView(){
+        return imageUri;
     }
 
-    public void setImageView(ImageView i){
-        imageView = i;
+    public void setImageView(Uri iU){
+        imageUri = iU;
     }
+
+    public long getId() { return id; }
+
+    public void setId(long _id) { id = _id; }
 
     public int getIndex(){
         return index;

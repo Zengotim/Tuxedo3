@@ -1,5 +1,6 @@
 package com.tk_squared.tuxedo3;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.app.Fragment;
@@ -9,8 +10,9 @@ import android.util.Log;
 import java.util.List;
 
 public class TuxedoActivity extends AppCompatActivity implements TuxedoActivityFragment.Callbacks{
-
+    private static Context context;
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tuxedo);
@@ -20,6 +22,11 @@ public class TuxedoActivity extends AppCompatActivity implements TuxedoActivityF
             fragment = new TuxedoActivityFragment();
             fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
+        context = getApplicationContext();
+    }
+
+    public static Context getTuxedoContext() {
+        return context;
     }
 
     @Override
