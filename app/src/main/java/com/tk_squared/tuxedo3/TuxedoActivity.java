@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.util.Log;
+import android.view.MenuItem;
 
 import java.util.List;
 
@@ -46,5 +47,20 @@ public class TuxedoActivity extends AppCompatActivity implements TuxedoActivityF
                 .addToBackStack(null)
                 .commit();
         Log.i("oss1", "onStationSelected completed");
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+
+        switch(item.getItemId()){
+            case android.R.id.home:
+                FragmentManager fm = getFragmentManager();
+                if (fm.getBackStackEntryCount() > 0){
+                    fm.popBackStack();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 }

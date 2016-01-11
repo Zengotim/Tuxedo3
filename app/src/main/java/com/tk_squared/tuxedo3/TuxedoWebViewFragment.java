@@ -20,6 +20,7 @@ import android.widget.Toast;
 public class TuxedoWebViewFragment extends Fragment{
 
     private Uri uri;
+    private WebView webview;
 
     public TuxedoWebViewFragment(){}
 
@@ -41,7 +42,15 @@ public class TuxedoWebViewFragment extends Fragment{
         //Inflate the main view
         View view = inflater.inflate(R.layout.fragment_webview, container, false);
         //Also grab a reference to the WebView inner view
-        WebView webview = (WebView) view.findViewById(R.id.webview_view);
+        webview = (WebView) view.findViewById(R.id.webview_view);
+
+
+        return view;
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
         //Setup the WebView
         webview.getSettings().setJavaScriptEnabled(true);
         webview.setWebChromeClient(new WebChromeClient() {
@@ -57,8 +66,12 @@ public class TuxedoWebViewFragment extends Fragment{
         });
         uri = Uri.parse(getArguments().getString("uri", null));
         webview.loadUrl(uri.toString());
+    }
 
-        return view;
+    @Override
+    public void onStop(){
+        super.onStop();
+        webview.destroy();
     }
 
 }
