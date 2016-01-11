@@ -33,7 +33,6 @@ public class TuxedoActivity extends AppCompatActivity implements TuxedoActivityF
     @Override
     public void onStationSelected(tkkStation station){
 
-        Log.i("oss", "onStationSelected called");
         FragmentManager fm = getFragmentManager();
 
         Fragment fragment = fm.findFragmentById(R.id.webview_fragment);
@@ -46,7 +45,6 @@ public class TuxedoActivity extends AppCompatActivity implements TuxedoActivityF
         fm.beginTransaction().replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
-        Log.i("oss1", "onStationSelected completed");
     }
 
     public boolean onOptionsItemSelected(MenuItem item){

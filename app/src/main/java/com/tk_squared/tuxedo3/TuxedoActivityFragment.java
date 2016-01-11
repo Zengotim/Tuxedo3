@@ -104,8 +104,8 @@ public class TuxedoActivityFragment extends ListFragment {
             title.setText(station.getName());
             subtitle.setText(station.getUri().toString());
 
-            IconLoadTask setIcon = new IconLoadTask(view, position);
-            setIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+            //IconLoadTask setIcon = new IconLoadTask(view, position);
+            //setIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
             return view;
         }
 
