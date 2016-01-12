@@ -67,18 +67,13 @@ public class TuxedoActivityFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("item_click_listener", "OnItemClickListener called");
                 tkkStation station = (tkkStation) getListAdapter().getItem(position);
-                Log.i("variable_created", "station variable created");
                 if (station==null){Log.i("null_station", "station variable is null");}
                 if (callbacks==null){
                     Log.i("null_callbacks", "callbacks variable is null");
                     callbacks = (Callbacks)getActivity();
                 }
                 callbacks.onStationSelected(station);
-
-
-                Log.i("item_click_listener1", "OnItemClickListener done");
             }
         });
     }
