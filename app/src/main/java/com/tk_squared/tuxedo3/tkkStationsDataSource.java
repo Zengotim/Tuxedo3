@@ -142,7 +142,10 @@ public class tkkStationsDataSource {
     }
 
     private tkkStation cursorToStation(Cursor cursor) {
-        return new tkkStation(cursor.getLong(0), cursor.getString(1), Uri.parse(cursor.getString(2)));
+        String s = cursor.getString(1);
+        Uri u = Uri.parse(cursor.getString(2));
+        String n = cursor.getString(3);
+        return new tkkStation(cursor.getLong(0), cursor.getString(3), Uri.parse(cursor.getString(2)));
     }
 /*
     private Comment cursorToComment(Cursor cursor) {

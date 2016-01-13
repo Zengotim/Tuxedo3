@@ -72,7 +72,7 @@ public class tkkDataMod {
 
     //Generates a list of dummy stations for UI testing and functionality
     private void genDummyData() {
-       // dataSource.deleteAll();
+        dataSource.deleteAll();
         instance.stations = dataSource.getAllStations();
        // SQLLoadTask reader = new SQLLoadTask(stations, dataSource);
        // reader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
