@@ -8,26 +8,47 @@ import android.app.FragmentManager;
 import android.util.Log;
 import android.view.MenuItem;
 
+//Millennial Media Ad Support
+import com.millennialmedia.MMSDK;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class TuxedoActivity extends AppCompatActivity implements TuxedoActivityFragment.Callbacks{
-    private static Context context;
-    @Override
+public class TuxedoActivity extends AppCompatActivity
+        implements TuxedoActivityFragment.Callbacks, tkkDataMod.Callbacks{
 
+    private tkkDataMod tuxData;
+    public tkkDataMod getData(){return tuxData;}
+    public void setData(tkkDataMod data){tuxData = data;}
+
+    private ArrayList<tkkStation> tkkData; public ArrayList<tkkStation> getTkkData(){return tkkData;}
+
+    public TuxedoActivity(){}
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tuxedo);
         FragmentManager fm = getFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment== null){
+            fragment = new SplashFragment();
+            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
+        }
+        tuxData = tkkDataMod.getInstance(this);
+        //Ad support init
+        MMSDK.initialize(this);
+    }
+
+    @Override
+    public void onDataLoaded(ArrayList<tkkStation> stations){
+        tkkData = stations;
+        FragmentManager fm = getFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (fragment== null){
             fragment = new TuxedoActivityFragment();
             fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
-        context = getApplicationContext();
-    }
-
-    public static Context getTuxedoContext() {
-        return context;
     }
 
     @Override
