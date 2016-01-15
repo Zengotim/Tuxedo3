@@ -1,5 +1,6 @@
 package com.tk_squared.tuxedo3;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -23,14 +24,19 @@ import java.util.List;
 
 public class tkkDataMod {
 
-
-    public interface tkkDataModInterface {
-        void getStations(ArrayList<tkkStation> _stations);
+    //TODO Hi Kevin I changed this naming for reasons you may feel free to ask about
+    public interface Callbacks {
+        void onDataLoaded(ArrayList<tkkStation> _stations);
+    }
+    //TODO Hi again Kevin I created this one for you to call for progress bar update
+    public interface ProgressUpdate {
+        void onProgressUpdate(float progress);
     }
 
     private static tkkDataMod instance = null;
     private ArrayList<tkkStation> stations;
     private tkkStationsDataSource dataSource;
+    private Activity _activity;
 
     public class SQLLoadTask extends AsyncTask<Void, Integer, Integer> {
 
@@ -56,18 +62,31 @@ public class tkkDataMod {
         }
     }
 
-    private tkkDataMod(){
-        stations = new ArrayList<>();
-        // uncomment to delete the database
-        //TuxedoActivity.getTuxedoContext().deleteDatabase("stations.db");
-        dataSource = new tkkStationsDataSource(TuxedoActivity.getTuxedoContext());
+    //Used to create tkkDataMod singleton
+    public static tkkDataMod getInstance(Activity activity){
 
-        try {
+        if(instance == null) {
+            instance = new tkkDataMod();
+            instance.stations = new ArrayList<>();
+            // uncomment to delete the database
+            //TuxedoActivity.getTuxedoContext().deleteDatabase("stations.db");
+            instance._activity = activity;
+            instance.dataSource = new tkkStationsDataSource(instance._activity.getApplicationContext());
 
-            dataSource.open();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            try {
+
+                instance.dataSource.open();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            //Replace genDummyData with real list pull method
+            instance.genDummyData();
         }
+        return instance;
+    }
+
+    private tkkDataMod(){
+
     }
 
     //Generates a list of dummy stations for UI testing and functionality
@@ -90,17 +109,6 @@ public class tkkDataMod {
         }
 
         System.out.println(stations.size());
-    }
-
-    //Used to create tkkDataMod singleton
-    public static tkkDataMod getInstance(){
-
-        if(instance == null) {
-            instance = new tkkDataMod();
-            //Replace genDummyData with real list pull method
-            instance.genDummyData();
-        }
-        return instance;
     }
 
     public ArrayList<tkkStation> getStations(){

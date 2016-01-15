@@ -40,11 +40,6 @@ public class TuxedoActivityFragment extends ListFragment {
     }
 
     @Override
-    public void onAttach(Context context){
-        super.onAttach(context);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_tuxedo, container, false);
@@ -53,7 +48,8 @@ public class TuxedoActivityFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ArrayAdapter adapter = new StationAdapter(getActivity(), tkkDataMod.getInstance().getStations());
+        TuxedoActivity tuxActivity = (TuxedoActivity)getActivity();
+        ArrayAdapter adapter = new StationAdapter(tuxActivity, tuxActivity.getTkkData());
         setListAdapter(adapter);
         callbacks = (Callbacks)getActivity();
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
