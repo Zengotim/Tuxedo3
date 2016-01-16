@@ -47,7 +47,10 @@ public class TuxedoActivity extends AppCompatActivity
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment== null){
             fragment = new TuxedoActivityFragment();
-            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
+            fm.beginTransaction().add(R.id.fragment_container, fragment).addToBackStack(null)
+                    .commit();
+            //fm.beginTransaction().replace(R.id.fragment_container, fragment).commit();
+            //fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
     }
 

@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Tuxedo3.iml" filepath="$PROJECT_DIR$/Tuxedo3.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/mm-ad-sdk/mm-ad-sdk.iml" filepath="$PROJECT_DIR$/mm-ad-sdk/mm-ad-sdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mm-ad-sdk/mm-ad-sdk.iml" filepath="$PROJECT_DIR$/mm-ad-sdk/mm-ad-sdk.iml" />
     </modules>
   </component>
 </project>

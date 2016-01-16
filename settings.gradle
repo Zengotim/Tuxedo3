@@ -1,1 +1,1 @@
-include ':app', ':mm-ad-sdk'
+include ':mm-ad-sdk', ':app'

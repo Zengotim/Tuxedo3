@@ -5,9 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -15,6 +18,22 @@ import java.util.ArrayList;
 * Created by Kevin on 1/10/2016.
 */
 public class tkkStationsDataSource {
+
+    public static class BitmapHelper {
+
+        // convert from bitmap to byte array
+        public static byte[] getBytes(Bitmap bitmap) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+            return stream.toByteArray();
+        }
+
+        // convert from byte array to bitmap
+        public static Bitmap getImage(byte[] image) {
+            return BitmapFactory.decodeByteArray(image, 0, image.length);
+        }
+    }
+
     public class MySQLiteHelper extends SQLiteOpenHelper {
 
         //  public static final String TABLE_COMMENTS = "comments";
@@ -33,7 +52,7 @@ public class tkkStationsDataSource {
         private static final String DATABASE_CREATE = "create table if not exists "
                 + TABLE_STATIONS + "(" + COLUMN_ID
                 + " integer primary key autoincrement, " + COLUMN_IDX + " integer, " + COLUMN_URI
-                + " text not null, " + COLUMN_NAME + " text not null, " + COLUMN_ICON + " text not null);";
+                + " text not null, " + COLUMN_NAME + " text not null, " + COLUMN_ICON + " BLOB);";
 
         public MySQLiteHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -57,6 +76,7 @@ public class tkkStationsDataSource {
     // Database fields
     private SQLiteDatabase database;
     private MySQLiteHelper dbHelper;
+    //private DbBitmapUtility bmHelper;
     private String[] allColumns = { MySQLiteHelper.COLUMN_ID,
             MySQLiteHelper.COLUMN_IDX,
             MySQLiteHelper.COLUMN_URI,
@@ -90,7 +110,25 @@ public class tkkStationsDataSource {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_URI, u.toString());
         values.put(MySQLiteHelper.COLUMN_NAME, n);
+
         values.put(MySQLiteHelper.COLUMN_ICON, "test");
+
+        long insertId = database.insert(MySQLiteHelper.TABLE_STATIONS, null, values);
+
+        Cursor cursor = database.query(MySQLiteHelper.TABLE_STATIONS,
+                allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
+        cursor.moveToFirst();
+        tkkStation newStation = cursorToStation(cursor);
+        cursor.close();
+        return newStation;
+    }
+
+    public tkkStation createStation(String n, Uri u, Bitmap b) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_URI, u.toString());
+        values.put(MySQLiteHelper.COLUMN_NAME, n);
+
+        values.put(MySQLiteHelper.COLUMN_ICON, BitmapHelper.getBytes(b));
 
         long insertId = database.insert(MySQLiteHelper.TABLE_STATIONS, null, values);
 
@@ -142,9 +180,12 @@ public class tkkStationsDataSource {
     }
 
     private tkkStation cursorToStation(Cursor cursor) {
-        String s = cursor.getString(1);
+     /*
+     String s = cursor.getString(1);
         Uri u = Uri.parse(cursor.getString(2));
         String n = cursor.getString(3);
+        */
+        byte[] i = cursor.getBlob(4);
         return new tkkStation(cursor.getLong(0), cursor.getString(3), Uri.parse(cursor.getString(2)));
     }
 /*

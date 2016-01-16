@@ -1,7 +1,7 @@
 package com.tk_squared.tuxedo3;
 
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.widget.ImageView;
 
 /**
  * Created by Kevin for tk^2 on 12/29/2015.
@@ -11,7 +11,8 @@ public class tkkStation {
     private long id;
     private Uri uri;
     private String name;
-    private Uri imageUri;
+    private Uri iconUri;
+    private BitmapDrawable icon;
     private int index;
 
     public tkkStation(){
@@ -36,20 +37,32 @@ public class tkkStation {
         name = n;
     }
 
+    public tkkStation(int idx, String n, BitmapDrawable b, Uri u) {
+
+        index = idx;
+        uri = u;
+        name = n;
+        icon = b;
+    }
+
     public tkkStation(int idx, long _id, Uri iU, String n, Uri u) {
         id = _id;
         index = idx;
         uri = u;
         name = n;
-        imageUri = iU;
+        iconUri = iU;
     }
 
-    public Uri getImageView(){
-        return imageUri;
+    public BitmapDrawable getIcon() { return icon; }
+
+    public void setIcon(BitmapDrawable i) { icon = i; }
+
+    public Uri getIconUri(){
+        return iconUri;
     }
 
-    public void setImageView(Uri iU){
-        imageUri = iU;
+    public void setIconUri(Uri iU){
+        iconUri = iU;
     }
 
     public long getId() { return id; }
