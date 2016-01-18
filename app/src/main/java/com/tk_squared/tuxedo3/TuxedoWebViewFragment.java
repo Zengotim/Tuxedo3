@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 import android.util.Log;
 
@@ -56,6 +57,13 @@ public class TuxedoWebViewFragment extends Fragment{
             public void onReceivedError(WebView view, int ErrorCode,
                                         String description, String failingURL) {
                 Toast.makeText(getActivity(), R.string.url_error, Toast.LENGTH_SHORT).show();
+            }
+        });
+        webview.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url){
+                view.loadUrl(url);
+                return false;
             }
         });
 

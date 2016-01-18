@@ -16,7 +16,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -64,8 +66,8 @@ public class TuxedoActivityFragment extends ListFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 tkkStation station = (tkkStation) getListAdapter().getItem(position);
-                if (callbacks==null){
-                    callbacks = (Callbacks)getActivity();
+                if (callbacks == null) {
+                    callbacks = (Callbacks) getActivity();
                 }
                 callbacks.onStationSelected(station);
             }
@@ -79,7 +81,7 @@ public class TuxedoActivityFragment extends ListFragment {
         }
 
         @Override
-        public View getView(int position, View view, ViewGroup parent){
+        public View getView(final int position, View view, ViewGroup parent){
 
             //Get the item for this cell
             final tkkStation station = getItem(position);
@@ -88,10 +90,21 @@ public class TuxedoActivityFragment extends ListFragment {
                 view = LayoutInflater.from(getContext()).inflate(R.layout.item_station, parent, false);
             }
             //Populate data
-            ((TextView)view.findViewById(R.id.station_title)).setText(station.getUri().toString());
+            ((TextView)view.findViewById(R.id.station_title)).setText(station.getName());
             ((TextView) view.findViewById(R.id.station_subtitle)).setText(station.getUri().toString());
-            ((ImageView) view.findViewById(R.id.station_icon)).setImageDrawable(station.getIcon());
-
+            BitmapDrawable icon = station.getIcon();
+            if (icon != null){
+                ((ImageView) view.findViewById(R.id.station_icon)).setImageDrawable(station.getIcon());
+            }
+            Button deleteButton = (Button)view.findViewById(R.id.delete_button);
+            deleteButton.setFocusable(false);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((TuxedoActivity) getActivity()).getData().removeStationAt(position);
+                    ((ArrayAdapter) getListAdapter()).notifyDataSetChanged();
+                }
+            });
             return view;
         }
     }
