@@ -1,8 +1,11 @@
 <resources>
-    <string name="app_name">Tuxedo3</string>
+    <string name="app_name">Tuxedo</string>
     <string name="action_settings">Settings</string>
     <string name="subtitle">Classical Stations</string>
-
+    <string name="station_title">Station Title</string>
+    <string name="station_subtitle">Station Subtitle</string>
     <string name="url_error">Oh No! That Station Didn\'t Load!</string>
-
+    <string name="ad_description">Ad support - We like to eat too!</string>
+    <string name="icon_description">Station Icon</string>
+    <string name="splash_description">TK-Squared Logo</string>
 </resources>

@@ -3,9 +3,7 @@
     android:id="@+id/webview_fragment"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorThemeBackground"
-    android:padding="5dp">
+    android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -23,6 +21,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
+        android:baselineAligned="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal">
@@ -31,6 +30,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight=".80"
+        android:paddingEnd="3dp"
         android:paddingRight="3dp"
         android:background="@color/colorThemeBackground">
         <WebView
@@ -42,13 +42,15 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight=".20"
+        android:paddingStart="2dp"
         android:paddingLeft="2dp"
         android:background="@color/colorThemeBackground">
         <ImageView
             android:id="@+id/webview_ad"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorThemeForeground"/>
+            android:background="@color/colorThemeForeground"
+            android:contentDescription="@string/ad_description"/>
     </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

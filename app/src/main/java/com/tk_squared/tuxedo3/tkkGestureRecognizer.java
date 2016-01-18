@@ -32,6 +32,7 @@ public class tkkGestureRecognizer implements View.OnTouchListener{
 
     private static final int MIN_DISTANCE = 100;
     private float down_x, down_y, up_x, up_y;
+    private int delta = 0;
     private Action tkkGestureDetected = Action.None;
 
     public boolean gestureDetected(){
@@ -59,6 +60,7 @@ public class tkkGestureRecognizer implements View.OnTouchListener{
                 //Horizontal swipe detect
                 if (_catch_rl || _catch_lr){
                 if (Math.abs(deltaX) > MIN_DISTANCE){
+                    delta = (int)deltaX;
                     if (deltaX < 0){
                         if (!_catch_lr)return false;
                         tkkGestureDetected = Action.LR;

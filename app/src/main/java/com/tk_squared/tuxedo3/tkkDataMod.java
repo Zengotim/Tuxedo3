@@ -102,7 +102,7 @@ public class tkkDataMod {
         @Override
         protected Integer doInBackground(Void... unused){
             try {
-              //  String
+                //  String
                 if(bitmap == null) {
                     if(iconURL == null)  iconURL = "http://www.google.com/favicon.ico";
                     bitmap = BitmapFactory.decodeStream((InputStream) new URL(iconURL).getContent());
@@ -133,8 +133,8 @@ public class tkkDataMod {
             dataSource.createStation(this.name, this.uri, this.bitmap);
 
             if(++completes >= tasks) {
-                    Callbacks cb = (Callbacks)_activity;
-                    cb.onDataLoaded(instance.stations);
+                Callbacks cb = (Callbacks)_activity;
+                cb.onDataLoaded(instance.stations);
             }
         }
     }
@@ -146,11 +146,11 @@ public class tkkDataMod {
     private void genDummyData() {
 
         //TIM COMMENT OUT dataSource.deleteAll(); to test how the app handles getting station data from the DB rather than populating
-       dataSource.deleteAll();
+        //dataSource.deleteAll();
         instance.stations = dataSource.getAllStations();
         //SQLLoadTask reader = new SQLLoadTask(stations, dataSource);
-       // reader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
-      //  try {
+        // reader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+        //  try {
 
         if (instance.stations.size() == 0) {
             for (int i = 1; i < 15; ++i) {
@@ -166,22 +166,15 @@ public class tkkDataMod {
                 wqxr.execute();
                 /*
 //                wsb.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
-
-
                 IconLoadTask wqxr = new IconLoadTask("WQXR " + i, "http://www.wqxr.org/#!/",
                         wqxrIcon);
                 wqxr.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
-
-
                 //URL wsb = new URL("http://www.google.com/s2/favicons?domain=wsbradio.com");
-
                     //instance.stations.add(dataSource.createStation("WSB " + i, Uri.parse("http://m.wsbradio.com/stream/"),
                             //BitmapFactory.decodeStream((InputStream) new URL(wsbIcon).getContent())));
                     instance.stations.add(dataSource.createStation("WQXR " + i, Uri.parse("http://www.wqxr.org/#!/")));
-
                 //instance.stations.add(new tkkStation("WSB "+i, Uri.parse("http://m.wsbradio.com/stream/")));
                 //instance.stations.add(new tkkStation("WQXR "+i, Uri.parse("http://www.wqxr.org/#!/")));
-
 */
             }
         } else {
@@ -228,7 +221,7 @@ public class tkkDataMod {
             instance = new tkkDataMod();
             //Replace genDummyData with real list pull method
 
-                instance.genDummyData();
+            instance.genDummyData();
 
         }
         return instance;

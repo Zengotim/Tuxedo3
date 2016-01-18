@@ -15,8 +15,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
-* Created by Kevin on 1/10/2016.
-*/
+ * Created by Kevin on 1/10/2016.
+ */
 public class tkkStationsDataSource {
 
     public static class BitmapHelper {

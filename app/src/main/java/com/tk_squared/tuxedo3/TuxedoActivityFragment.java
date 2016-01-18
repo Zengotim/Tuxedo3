@@ -1,9 +1,8 @@
 package com.tk_squared.tuxedo3;
 
-import android.app.Activity;
+
 import android.app.ListFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Bitmap;
@@ -18,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -32,6 +30,7 @@ public class TuxedoActivityFragment extends ListFragment {
 
     public Callbacks callbacks;
 
+    //Interface for handling fragment change on selection
     public interface Callbacks{
         void onStationSelected(tkkStation station);
     }
@@ -48,14 +47,15 @@ public class TuxedoActivityFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         TuxedoActivity tuxActivity = (TuxedoActivity)getActivity();
         ArrayAdapter adapter = new StationAdapter(tuxActivity, tuxActivity.getTkkData());
         setListAdapter(adapter);
-        callbacks = (Callbacks)getActivity();
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        callbacks = tuxActivity;
+
+        Toolbar toolbar = (Toolbar) tuxActivity.findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.subtitle);
-        AppCompatActivity activity = (AppCompatActivity)getActivity();
-        activity.setSupportActionBar(toolbar);
+        tuxActivity.setSupportActionBar(toolbar);
     }
 
     @Override
@@ -64,9 +64,7 @@ public class TuxedoActivityFragment extends ListFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 tkkStation station = (tkkStation) getListAdapter().getItem(position);
-                if (station==null){Log.i("null_station", "station variable is null");}
                 if (callbacks==null){
-                    Log.i("null_callbacks", "callbacks variable is null");
                     callbacks = (Callbacks)getActivity();
                 }
                 callbacks.onStationSelected(station);
@@ -82,59 +80,19 @@ public class TuxedoActivityFragment extends ListFragment {
 
         @Override
         public View getView(int position, View view, ViewGroup parent){
+
             //Get the item for this cell
             final tkkStation station = getItem(position);
             //Cell may be being recycled, otherwise inflate view
             if (view == null){
                 view = LayoutInflater.from(getContext()).inflate(R.layout.item_station, parent, false);
             }
-
             //Populate data
-            TextView title = (TextView) view.findViewById(R.id.station_title);
-            TextView subtitle = (TextView) view.findViewById(R.id.station_subtitle);
-            title.setText(station.getName());
-            subtitle.setText(station.getUri().toString());
+            ((TextView)view.findViewById(R.id.station_title)).setText(station.getUri().toString());
+            ((TextView) view.findViewById(R.id.station_subtitle)).setText(station.getUri().toString());
+            ((ImageView) view.findViewById(R.id.station_icon)).setImageDrawable(station.getIcon());
 
-            //IconLoadTask setIcon = new IconLoadTask(view, position);
-            //setIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
             return view;
-        }
-
-        public class IconLoadTask extends AsyncTask<Void, Integer, Integer>{
-            private View view;
-            private Integer position;
-            private BitmapDrawable icon;
-            public IconLoadTask(View view, Integer position){
-                this.view = view;
-                this.position = position;
-            }
-
-            @Override
-            protected Integer doInBackground(Void... unused){
-                try {
-                    String iconURL = "http://www.google.com/favicon.ico";
-                    Bitmap _icon = BitmapFactory.decodeStream((InputStream) new URL(iconURL).getContent());
-                    if (_icon != null) {
-                        icon = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(_icon, 96, 96, false));
-                    }
-                }
-                catch(MalformedURLException e){
-                    //do nothing
-                }
-                catch (IOException e){
-                    //Still nothing;
-                }
-                return 0;
-            }
-
-            protected void onProgressUpdate(Integer... progress){
-                //TODO: make progress tint bar across image
-            }
-
-            protected void onPostExecute(Integer result){
-                ImageView imageView = (ImageView)view.findViewById(R.id.station_icon);
-                imageView.setImageDrawable(icon);
-            }
         }
     }
 }

@@ -1,27 +1,27 @@
 package com.tk_squared.tuxedo3;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.Toast;
+import android.util.Log;
 
 /**
  * Created by Tim on 1/4/2016.
  * 'Cuz Tim rocks.
  */
+@SuppressLint("SetJavaScriptEnabled")
 public class TuxedoWebViewFragment extends Fragment{
 
-    private Uri uri;
     private WebView webview;
-
     public TuxedoWebViewFragment(){}
 
     @Override
@@ -52,14 +52,14 @@ public class TuxedoWebViewFragment extends Fragment{
                 getActivity().setProgress(progress * 1000);
             }
         });
-        webview.setWebChromeClient(new WebChromeClient(){
+        webview.setWebChromeClient(new WebChromeClient() {
             public void onReceivedError(WebView view, int ErrorCode,
-                                        String description, String failingURL){
+                                        String description, String failingURL) {
                 Toast.makeText(getActivity(), R.string.url_error, Toast.LENGTH_SHORT).show();
             }
         });
-        uri = Uri.parse(getArguments().getString("uri", null));
-        webview.loadUrl(uri.toString());
+
+        webview.loadUrl(Uri.parse(getArguments().getString("uri", null)).toString());
     }
 
     @Override

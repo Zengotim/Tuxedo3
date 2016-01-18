@@ -3,9 +3,7 @@
     android:id="@+id/webview_fragment"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorThemeBackground"
-    android:padding="5dp">
+    android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -43,6 +41,7 @@
             android:id="@+id/webview_ad"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorThemeForeground"/>
+            android:background="@color/colorThemeForeground"
+            android:contentDescription="@string/ad_description"/>
     </RelativeLayout>
 </LinearLayout>

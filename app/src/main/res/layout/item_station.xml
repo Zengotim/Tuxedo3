@@ -10,7 +10,8 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.2"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/ic_launcher"
+        android:contentDescription="@string/icon_description"/>
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"
@@ -21,13 +22,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorTextLight"
-            android:text="Station Name" />
+            android:text="@string/station_title" />
         <TextView
             android:id="@+id/station_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorTextLight"
-            android:text="Station Subtitle"/>
+            android:text="@string/station_subtitle"/>
     </LinearLayout>
 
 </LinearLayout>
