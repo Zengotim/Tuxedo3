@@ -61,13 +61,14 @@ public class TuxedoWebViewFragment extends Fragment{
         });
         webview.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url){
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
                 return false;
             }
         });
 
         webview.loadUrl(Uri.parse(getArguments().getString("uri", null)).toString());
+        Log.i("URL", Uri.parse(getArguments().getString("uri", null)).toString());
     }
 
     @Override
@@ -75,5 +76,4 @@ public class TuxedoWebViewFragment extends Fragment{
         super.onPause();
         webview.destroy();
     }
-
 }
