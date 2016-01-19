@@ -1,30 +1,19 @@
 package com.tk_squared.tuxedo3;
 
 import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.telecom.Call;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by Kevin on 12/29/2015.
@@ -62,7 +51,7 @@ public class tkkDataMod {
 
         @Override
         protected Integer doInBackground(Void... params) {
-            tkkDataMod.instance.setStations(dataSource.getAllStations());
+            tkkDataMod.instance.setStations(dataSource.getAllStations(_activity));
             return null;
         }
 
@@ -75,7 +64,7 @@ public class tkkDataMod {
         }
     }
 
-    public class IconLoadTask extends AsyncTask<Void, Integer, Integer>{
+    public class CreateStationTask extends AsyncTask<Void, Integer, Integer>{
         private BitmapDrawable icon;
         private Bitmap bitmap;
         private tkkStation station;
@@ -83,18 +72,18 @@ public class tkkDataMod {
         private String iconURL;
         private Uri uri;
 
-        public IconLoadTask(tkkStation station, String iconURL){
+        public CreateStationTask(tkkStation station, String iconURL){
             this.station = station;
             this.iconURL = iconURL;
         }
 
-        public IconLoadTask(String name, String uri, String iconURL) {
+        public CreateStationTask(String name, String uri, String iconURL) {
             this.name = name;
             this.iconURL = iconURL;
             this.uri = Uri.parse(uri);
         }
 
-        public IconLoadTask(tkkStation station, byte[] bytes) {
+        public CreateStationTask(tkkStation station, byte[] bytes) {
             this.station = station;
             this.bitmap = tkkStationsDataSource.BitmapHelper.getImage(bytes);
         }
@@ -112,13 +101,14 @@ public class tkkDataMod {
                     byte[] blob = tkkStationsDataSource.BitmapHelper.getBytes(bitmap);
 
                     icon = new BitmapDrawable(_activity.getApplicationContext().getResources(), Bitmap.createScaledBitmap(bitmap, 96, 96, false));
-                    instance.stations.add(new tkkStation(instance.stations.size(), this.name, icon, this.uri));
+                   // instance.stations.add(new tkkStation(instance.stations.size(), this.name, icon, this.uri));
                 }
             }
             catch(MalformedURLException e){
                 //do nothing
             }
             catch (IOException e){
+                Log.i("IOException", "IOException: " + e.toString());
                 //Still nothing;
             }
             return 0;
@@ -130,7 +120,7 @@ public class tkkDataMod {
 
         protected void onPostExecute(Integer result){
 
-            dataSource.createStation(this.name, this.uri, this.bitmap);
+            instance.stations.add(dataSource.createStation(this.name, this.uri, this.bitmap, _activity));
 
             if(++completes >= tasks) {
                 Callbacks cb = (Callbacks)_activity;
@@ -146,46 +136,27 @@ public class tkkDataMod {
     private void genDummyData() {
 
         //TIM COMMENT OUT dataSource.deleteAll(); to test how the app handles getting station data from the DB rather than populating
-        dataSource.deleteAll();
-        instance.stations = dataSource.getAllStations();
-        //SQLLoadTask reader = new SQLLoadTask(stations, dataSource);
-        // reader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
-        //  try {
+       // dataSource.deleteAll();
+        instance.stations = dataSource.getAllStations(_activity);
 
         if (instance.stations.size() == 0) {
             for (int i = 1; i < 15; ++i) {
                 String wsbIcon = "http://www.google.com/s2/favicons?domain=wsbradio.com";
                 String wqxrIcon = "http://www.google.com/s2/favicons?domain=wqxr.org";
 
-                IconLoadTask wsb = new IconLoadTask("WSB " + i, "http://m.wsbradio.com/stream/",
+                CreateStationTask wsb = new CreateStationTask("WSB " + i, "http://m.wsbradio.com/stream/",
                         wsbIcon);
                 ++tasks;
                 wsb.execute();
-                IconLoadTask wqxr = new IconLoadTask("WQXR" + i, "http://wqxr.org/#!/", wqxrIcon);
+                CreateStationTask wqxr = new CreateStationTask("WQXR" + i, "http://wqxr.org/#!/", wqxrIcon);
                 ++tasks;
                 wqxr.execute();
-                /*
-//                wsb.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
-                IconLoadTask wqxr = new IconLoadTask("WQXR " + i, "http://www.wqxr.org/#!/",
-                        wqxrIcon);
-                wqxr.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
-                //URL wsb = new URL("http://www.google.com/s2/favicons?domain=wsbradio.com");
-                    //instance.stations.add(dataSource.createStation("WSB " + i, Uri.parse("http://m.wsbradio.com/stream/"),
-                            //BitmapFactory.decodeStream((InputStream) new URL(wsbIcon).getContent())));
-                    instance.stations.add(dataSource.createStation("WQXR " + i, Uri.parse("http://www.wqxr.org/#!/")));
-                //instance.stations.add(new tkkStation("WSB "+i, Uri.parse("http://m.wsbradio.com/stream/")));
-                //instance.stations.add(new tkkStation("WQXR "+i, Uri.parse("http://www.wqxr.org/#!/")));
-*/
+
             }
         } else {
             Callbacks cb = (Callbacks)_activity;
             cb.onDataLoaded(instance.stations);
         }
-        /*} catch (MalformedURLException e){
-            Log.d("FUCK", "MUE");
-        } catch (IOException e) {
-            Log.d("FUCK", "IOE");
-        }*/
 
         System.out.println(stations.size());
     }
@@ -250,11 +221,12 @@ public class tkkDataMod {
     public void moveStation(tkkStation s, int newIdx){
         stations.remove(s);
         stations.add(newIdx,s);
+        int iter = s.getIndex() <= newIdx ? s.getIndex() : newIdx;
 
-        for (int i = newIdx; i < stations.size(); ++i){
+        for (int i = iter; i < stations.size(); ++i){
             tkkStation temp = stations.get(i);
             temp.setIndex(i);
-            dataSource.updateStation(s);
+            dataSource.updateStation(s, _activity);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.tk_squared.tuxedo3;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.util.Log;
 
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Kevin on 1/10/2016.
+ * Uses modified example code from stackoverflow
  */
 public class tkkStationsDataSource {
 
@@ -106,7 +109,7 @@ public class tkkStationsDataSource {
         s.setIndex(((int) insertId));
     }
 
-    public tkkStation createStation(String n, Uri u) {
+    public tkkStation createStation(String n, Uri u, Activity activity) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_URI, u.toString());
         values.put(MySQLiteHelper.COLUMN_NAME, n);
@@ -118,12 +121,12 @@ public class tkkStationsDataSource {
         Cursor cursor = database.query(MySQLiteHelper.TABLE_STATIONS,
                 allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
         cursor.moveToFirst();
-        tkkStation newStation = cursorToStation(cursor);
+        tkkStation newStation = cursorToStation(cursor, activity);
         cursor.close();
         return newStation;
     }
 
-    public tkkStation createStation(String n, Uri u, Bitmap b) {
+    public tkkStation createStation(String n, Uri u, Bitmap b, Activity activity) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_URI, u.toString());
         values.put(MySQLiteHelper.COLUMN_NAME, n);
@@ -135,7 +138,7 @@ public class tkkStationsDataSource {
         Cursor cursor = database.query(MySQLiteHelper.TABLE_STATIONS,
                 allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
         cursor.moveToFirst();
-        tkkStation newStation = cursorToStation(cursor);
+        tkkStation newStation = cursorToStation(cursor, activity);
         cursor.close();
         return newStation;
     }
@@ -143,16 +146,18 @@ public class tkkStationsDataSource {
 
     public void deleteStation (tkkStation station) {
         long id = station.getId();
-        System.out.println("tkkStation deleted with id: " + id);
+        Log.i("Delete Station", "tkkStation deleted with id: " + id);
         database.delete(MySQLiteHelper.TABLE_STATIONS, MySQLiteHelper.COLUMN_ID + " = " + id, null);
     }
 
-    public void updateStation(tkkStation s){
+    public void updateStation(tkkStation s, Activity activity){
         ContentValues cv = new ContentValues();
         cv.put(MySQLiteHelper.COLUMN_IDX, s.getIndex());
         cv.put(MySQLiteHelper.COLUMN_NAME, s.getName());
         cv.put(MySQLiteHelper.COLUMN_URI, s.getUri().toString());
-        cv.put(MySQLiteHelper.COLUMN_ICON, s.getIconURI().toString());
+        Bitmap bmp = s.getIcon().getBitmap();
+        byte[] i = BitmapHelper.getBytes(bmp);
+        cv.put(MySQLiteHelper.COLUMN_ICON, i);
 
         database.update(MySQLiteHelper.TABLE_STATIONS, cv, "_id=" + s.getId(), null);
 
@@ -162,7 +167,7 @@ public class tkkStationsDataSource {
         database.delete(MySQLiteHelper.TABLE_STATIONS, null, null);
     }
 
-    public ArrayList<tkkStation> getAllStations() {
+    public ArrayList<tkkStation> getAllStations(Activity activity) {
         ArrayList<tkkStation> stations = new ArrayList<>();
 
         Cursor cursor = database.query(MySQLiteHelper.TABLE_STATIONS,
@@ -170,7 +175,7 @@ public class tkkStationsDataSource {
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            tkkStation station = cursorToStation(cursor);
+            tkkStation station = cursorToStation(cursor, activity);
             stations.add(station);
             cursor.moveToNext();
         }
@@ -179,22 +184,17 @@ public class tkkStationsDataSource {
         return stations;
     }
 
-    private tkkStation cursorToStation(Cursor cursor) {
+    private tkkStation cursorToStation(Cursor cursor, Activity activity) {
      /*
      String s = cursor.getString(1);
         Uri u = Uri.parse(cursor.getString(2));
         String n = cursor.getString(3);
         */
         byte[] i = cursor.getBlob(4);
-        return new tkkStation(cursor.getLong(0), cursor.getString(3), Uri.parse(cursor.getString(2)));
+        Bitmap bmp = tkkStationsDataSource.BitmapHelper.getImage(i);
+        BitmapDrawable icon = new BitmapDrawable(activity.getApplicationContext().getResources(), Bitmap.createScaledBitmap(bmp, 96, 96, false));
+        return new tkkStation(cursor.getLong(0), cursor.getString(3), icon, Uri.parse(cursor.getString(2)));
     }
-/*
-    private Comment cursorToComment(Cursor cursor) {
-        Comment comment = new Comment();
-        comment.setId(cursor.getLong(0));
-        comment.setComment(cursor.getString(1));
-        return comment;
-    }
-    */
+
 
 }

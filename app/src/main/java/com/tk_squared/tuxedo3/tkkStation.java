@@ -24,9 +24,10 @@ public class tkkStation {
         return Uri.parse("http://www.tshirthell.com/favicon.ico");
     }
 
-    public tkkStation(long _id, String n, Uri u) {
+    public tkkStation(long _id, String n, BitmapDrawable b, Uri u) {
         id = _id;
         uri = u;
+        icon = b;
         name = n;
     }
 
