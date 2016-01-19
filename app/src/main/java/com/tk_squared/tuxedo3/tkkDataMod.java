@@ -146,7 +146,7 @@ public class tkkDataMod {
     private void genDummyData() {
 
         //TIM COMMENT OUT dataSource.deleteAll(); to test how the app handles getting station data from the DB rather than populating
-        //dataSource.deleteAll();
+        dataSource.deleteAll();
         instance.stations = dataSource.getAllStations();
         //SQLLoadTask reader = new SQLLoadTask(stations, dataSource);
         // reader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
@@ -161,7 +161,7 @@ public class tkkDataMod {
                         wsbIcon);
                 ++tasks;
                 wsb.execute();
-                IconLoadTask wqxr = new IconLoadTask("WXQR" + i, "http://wxqr.org/#!/", wqxrIcon);
+                IconLoadTask wqxr = new IconLoadTask("WQXR" + i, "http://wqxr.org/#!/", wqxrIcon);
                 ++tasks;
                 wqxr.execute();
                 /*
