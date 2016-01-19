@@ -45,12 +45,17 @@ public class TuxedoActivity extends AppCompatActivity
         tkkData = stations;
         FragmentManager fm = getFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (fragment == null){
+       /* if (fragment == null){
             fragment = new TuxedoActivityFragment();
             fm.beginTransaction().replace(R.id.fragment_container, fragment)
                     .addToBackStack(null)
                     .commit();
-        }
+        }*/
+
+        fragment = new TuxedoActivityFragment();
+        fm.beginTransaction().replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     //Callback method for TuxedoActivityFragment.Callbacks
