@@ -8,10 +8,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.millennialmedia.internal.utils.IOUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -27,11 +33,12 @@ public class tkkDataMod {
     public interface Callbacks {
         void onDataLoaded(ArrayList<tkkStation> _stations);
     }
+    /*
     //TODO Hi again Kevin I created this one for you to call for progress bar update
     public interface ProgressUpdate {
         void onProgressUpdate(float progress);
     }
-
+    */
 
     private static tkkDataMod instance = null;
     private ArrayList<tkkStation> stations;
@@ -39,6 +46,73 @@ public class tkkDataMod {
     private Activity _activity;
     private int tasks = 0;
     private int completes = 0;
+
+    public class GetServerDataTask extends  AsyncTask<Void, Integer, Integer> {
+
+
+        String body;
+
+        ArrayList<JSONObject> jsons;
+
+        public GetServerDataTask(){
+            this.jsons = new ArrayList<>();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                URL url = new URL("http://tk-squared.com/tuxedo/googleapitest/stations.json");
+                URLConnection con = url.openConnection();
+                InputStream in = con.getInputStream();
+                this.body = IOUtils.convertStreamToString(in);
+                String[] lines = this.body.split("~#%#~");
+                String serverListVersion = lines[0];
+                this.body = lines[1];
+
+                lines = this.body.split("-");
+
+                for(int i = 0; i < lines.length; ++i) {
+  //                  JSONObject json = new JSONObject(lines[i]);
+                    ++tasks;
+
+                    jsons.add(new JSONObject(lines[i]));
+                }
+
+                //this.json = new JSONObject(body);
+
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Integer result) {
+          for(int i = 0; i < jsons.size(); ++i) {
+              JSONObject json = jsons.get(i);
+              String name;
+              String url;
+              String iconUrl;
+              try {
+                  name = json.getString("name");
+                  url = json.getString("url");
+                  iconUrl = json.getString("icon");
+                  CreateStationTask worker = new CreateStationTask(name, url, iconUrl);
+                  worker.execute();
+              } catch (JSONException e) {
+                  e.printStackTrace();
+              }
+
+
+          }
+
+            Log.i("JSON", body);
+        }
+    }
 
     public class SQLLoadTask extends AsyncTask<Void, Integer, Integer> {
 
@@ -95,13 +169,11 @@ public class tkkDataMod {
                 if(bitmap == null) {
                     if(iconURL == null)  iconURL = "http://www.google.com/favicon.ico";
                     bitmap = BitmapFactory.decodeStream((InputStream) new URL(iconURL).getContent());
-                    //instance.stations.add(dataSource.createStation(station.getName(), this.uri, this.bitmap));
                 }
                 if (bitmap != null) {
-                    byte[] blob = tkkStationsDataSource.BitmapHelper.getBytes(bitmap);
+                    //byte[] blob = tkkStationsDataSource.BitmapHelper.getBytes(bitmap);
 
-                    icon = new BitmapDrawable(_activity.getApplicationContext().getResources(), Bitmap.createScaledBitmap(bitmap, 96, 96, false));
-                   // instance.stations.add(new tkkStation(instance.stations.size(), this.name, icon, this.uri));
+                    icon = new BitmapDrawable(_activity.getApplicationContext().getResources(), Bitmap.createScaledBitmap(bitmap, 32, 32, false));
                 }
             }
             catch(MalformedURLException e){
@@ -133,13 +205,22 @@ public class tkkDataMod {
     }
 
     //Generates a list of dummy stations for UI testing and functionality
+
     private void genDummyData() {
 
         //TIM COMMENT OUT dataSource.deleteAll(); to test how the app handles getting station data from the DB rather than populating
-       // dataSource.deleteAll();
+        dataSource.deleteAll();
+
+
+
         instance.stations = dataSource.getAllStations(_activity);
 
         if (instance.stations.size() == 0) {
+
+            GetServerDataTask reader = new GetServerDataTask();
+
+            reader.execute();
+            /*
             for (int i = 1; i < 15; ++i) {
                 String wsbIcon = "http://www.google.com/s2/favicons?domain=wsbradio.com";
                 String wqxrIcon = "http://www.google.com/s2/favicons?domain=wqxr.org";
@@ -153,6 +234,7 @@ public class tkkDataMod {
                 wqxr.execute();
 
             }
+            */
         } else {
             Callbacks cb = (Callbacks)_activity;
             cb.onDataLoaded(instance.stations);
