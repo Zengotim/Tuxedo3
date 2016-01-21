@@ -31,17 +31,4 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent" />
     </RelativeLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".20"
-        android:paddingTop="2dp"
-        android:background="@color/colorThemeBackground">
-        <ImageView
-            android:id="@+id/webview_ad"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorThemeForeground"
-            android:contentDescription="@string/ad_description"/>
-    </RelativeLayout>
 </LinearLayout>

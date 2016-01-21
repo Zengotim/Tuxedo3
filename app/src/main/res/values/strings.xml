@@ -8,4 +8,5 @@
     <string name="ad_description">Ad support - We like to eat too!</string>
     <string name="icon_description">Station Icon</string>
     <string name="splash_description">TK-Squared Logo</string>
+    <string name="mmedia_tag">Ad Server message - </string>
 </resources>

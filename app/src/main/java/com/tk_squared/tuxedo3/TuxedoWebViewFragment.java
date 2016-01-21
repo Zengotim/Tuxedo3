@@ -14,6 +14,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 import android.util.Log;
+import android.widget.ImageView;
+
+import com.millennialmedia.InlineAd;
+import com.millennialmedia.MMException;
 
 /**
  * Created by Tim on 1/4/2016.

@@ -27,6 +27,9 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
+import com.millennialmedia.InlineAd;
+import com.millennialmedia.MMException;
+
 
 public class TuxedoActivityFragment extends ListFragment {
 
