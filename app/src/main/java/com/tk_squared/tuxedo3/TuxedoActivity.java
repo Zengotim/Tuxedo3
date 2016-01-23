@@ -93,6 +93,7 @@ public class TuxedoActivity extends AppCompatActivity
         return true;
     }
 
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -105,7 +106,7 @@ public class TuxedoActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
     @Override
     public void onBackPressed(){
@@ -170,7 +171,6 @@ public class TuxedoActivity extends AppCompatActivity
                         final InlineAd.InlineAdMetadata inlineAdMetadata = new InlineAd.InlineAdMetadata().
                                 setAdSize(InlineAd.AdSize.BANNER);
 
-                        inlineAd.request(inlineAdMetadata);
                     }
                     Log.i(TAG, "Inline Ad loaded.");
                 }
