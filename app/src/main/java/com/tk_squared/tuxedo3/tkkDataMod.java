@@ -243,8 +243,7 @@ public class tkkDataMod {
         System.out.println(stations.size());
     }
 
-
-
+    //Used to create tkkDataMod singleton
     public static tkkDataMod getInstance(Activity activity){
 
         if(instance == null) {
@@ -263,8 +262,12 @@ public class tkkDataMod {
             }
             //Replace genDummyData with real list pull method
             instance.genDummyData();
+            return instance;
+        }/* TIM KILL THIS ELSE STATEMENT IF IT CAUSES PROBLEMS */ else {
+            instance = null;
+             return tkkDataMod.getInstance(activity);
         }
-        return instance;
+
     }
 
     //Used to create tkkDataMod singleton
@@ -278,6 +281,10 @@ public class tkkDataMod {
 
         }
         return instance;
+    }
+
+    public void destroyInstance(){
+        instance = null;
     }
 
     public ArrayList<tkkStation> getStations(){
