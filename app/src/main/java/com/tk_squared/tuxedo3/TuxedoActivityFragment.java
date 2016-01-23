@@ -3,13 +3,8 @@ package com.tk_squared.tuxedo3;
 
 import android.app.ListFragment;
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.os.Bundle;
@@ -18,18 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-
-import com.millennialmedia.InlineAd;
-import com.millennialmedia.MMException;
-
 
 public class TuxedoActivityFragment extends ListFragment {
 
@@ -41,6 +26,12 @@ public class TuxedoActivityFragment extends ListFragment {
     }
 
     public TuxedoActivityFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override

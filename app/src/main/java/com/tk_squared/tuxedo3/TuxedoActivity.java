@@ -1,6 +1,5 @@
 package com.tk_squared.tuxedo3;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.app.Fragment;
@@ -17,8 +16,6 @@ import android.widget.ImageView;
 import com.millennialmedia.InlineAd;
 import com.millennialmedia.MMException;
 import com.millennialmedia.MMSDK;
-import com.millennialmedia.UserData;
-
 
 public class TuxedoActivity extends AppCompatActivity
         implements TuxedoActivityFragment.Callbacks, tkkDataMod.Callbacks {
@@ -32,8 +29,9 @@ public class TuxedoActivity extends AppCompatActivity
     }
     private ArrayList<tkkStation> tkkData;
     public ArrayList<tkkStation> getTkkData() { return tkkData; }
+    private FragmentManager fm;
     private Integer curFragment = 0;
-    private static String TAG = "@string/mmedia_tag";
+    private static final String TAG = "Ad Server message - ";
 
     public TuxedoActivity() {
     }
@@ -42,18 +40,18 @@ public class TuxedoActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tuxedo);
+        //Set up ad support
         setMMedia();
         setAdSpace();
         //Begin app with Splash Screen
-        FragmentManager fm = getFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.splash_fragment);
+        fm = getFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment == null) {
             fragment = new SplashFragment();
             fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
         //Get data model
         tuxData = tkkDataMod.getInstance(this);
-        //Ad support init
     }
 
     //Callback method for tkkDataMod.Callbacks
@@ -61,12 +59,11 @@ public class TuxedoActivity extends AppCompatActivity
     public void onDataLoaded(ArrayList<tkkStation> stations) {
         //Set data and switch to Listview fragment
         tkkData = stations;
-        FragmentManager fm = getFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.listview_fragment);
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (!(fragment instanceof TuxedoActivityFragment)){
             fragment = new TuxedoActivityFragment();
             fm.beginTransaction().replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
+                    .addToBackStack("ListView")
                     .commit();
         }
     }
@@ -75,32 +72,32 @@ public class TuxedoActivity extends AppCompatActivity
     @Override
     public void onStationSelected(tkkStation station) {
         //Change to WebView to view selected station
-        FragmentManager fm = getFragmentManager();
-        Fragment fragment = new TuxedoWebViewFragment();
-        Bundle args = new Bundle();
-        args.putString("uri", station.getUri().toString());
-        fragment.setArguments(args);
-        fm.beginTransaction().replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
-                .commit();
-        curFragment = 3;
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (!(fragment instanceof TuxedoWebViewFragment)) {
+            fragment = new TuxedoWebViewFragment();
+            Bundle args = new Bundle();
+            args.putString("uri", station.getUri().toString());
+            fragment.setArguments(args);
+            fm.beginTransaction().replace(R.id.fragment_container, fragment)
+                    .addToBackStack("webView")
+                    .commit();
+            curFragment = 3;
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
-        Log.i("menu Creator", curFragment.toString());
         if (curFragment != 3) {
             getMenuInflater().inflate(R.menu.menu_tuxedo, menu);
         }
         return true;
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
                 curFragment = 2;
-                FragmentManager fm = getFragmentManager();
                 if (fm.getBackStackEntryCount() > 0) {
                     fm.popBackStack();
                 }
@@ -108,7 +105,19 @@ public class TuxedoActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
 
+    @Override
+    public void onBackPressed(){
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (fragment instanceof TuxedoWebViewFragment &&
+                ((TuxedoWebViewFragment) fragment).getWebview().canGoBack()){
+            ((TuxedoWebViewFragment) fragment).getWebview().goBack();
+        }else if (fm.getBackStackEntryCount() > 1){
+            fm.popBackStack();
+        }else{
+            super.onBackPressed();
+        }
     }
 
     //for Ad Support settings
@@ -142,7 +151,7 @@ public class TuxedoActivity extends AppCompatActivity
             if (adContainer == null){
                 adContainer = new ImageView(this);
             }
-            InlineAd inlineAd = InlineAd.createInstance("218764", (ViewGroup) adContainer);
+            InlineAd inlineAd = InlineAd.createInstance(getString(R.string.mmedia_apid), (ViewGroup) adContainer);
             final InlineAd.InlineAdMetadata inlineAdMetadata = new InlineAd.InlineAdMetadata().
                     setAdSize(InlineAd.AdSize.BANNER);
 

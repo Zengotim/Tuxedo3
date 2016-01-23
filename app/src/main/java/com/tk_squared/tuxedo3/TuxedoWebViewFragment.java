@@ -12,21 +12,17 @@ import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 import android.util.Log;
-import android.widget.ImageView;
-
-import com.millennialmedia.InlineAd;
-import com.millennialmedia.MMException;
 
 /**
  * Created by Tim on 1/4/2016.
  * 'Cuz Tim rocks.
  */
+
 @SuppressLint("SetJavaScriptEnabled")
 public class TuxedoWebViewFragment extends Fragment{
 
-    private WebView webview;
+    private WebView webview; public WebView getWebview(){ return webview;}
     public TuxedoWebViewFragment(){}
 
     @Override
@@ -36,8 +32,6 @@ public class TuxedoWebViewFragment extends Fragment{
         toolbar.setSubtitle(R.string.subtitle);
         AppCompatActivity activity = (AppCompatActivity)getActivity();
         activity.setSupportActionBar(toolbar);
-        activity.getSupportActionBar().setDisplayShowHomeEnabled(true);
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -55,12 +49,6 @@ public class TuxedoWebViewFragment extends Fragment{
         webview.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
                 getActivity().setProgress(progress * 1000);
-            }
-        });
-        webview.setWebChromeClient(new WebChromeClient() {
-            public void onReceivedError(WebView view, int ErrorCode,
-                                        String description, String failingURL) {
-                Toast.makeText(getActivity(), R.string.url_error, Toast.LENGTH_SHORT).show();
             }
         });
         webview.setWebViewClient(new WebViewClient() {
