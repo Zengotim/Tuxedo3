@@ -11,6 +11,7 @@
         android:id="@+id/action_edit"
         android:orderInCategory="200"
         android:title="Edit List"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        android:checkable="true"/>
 
 </menu>

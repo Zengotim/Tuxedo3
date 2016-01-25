@@ -30,8 +30,9 @@ public class TuxedoActivity extends AppCompatActivity
     private ArrayList<tkkStation> tkkData;
     public ArrayList<tkkStation> getTkkData() { return tkkData; }
     private FragmentManager fm;
-    private Integer curFragment = 0;
     private static final String TAG = "Ad Server message - ";
+    private boolean listEditEnabled = false; public boolean getListEditEnabled(){return listEditEnabled;}
+    public void setEditEnabled(boolean enableEdit){listEditEnabled = enableEdit;}
 
     public TuxedoActivity() {
     }
@@ -81,32 +82,41 @@ public class TuxedoActivity extends AppCompatActivity
             fm.beginTransaction().replace(R.id.fragment_container, fragment)
                     .addToBackStack("webView")
                     .commit();
-            curFragment = 3;
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
-        if (curFragment != 3) {
+        if (fm.findFragmentById(R.id.fragment_container) instanceof TuxedoActivityFragment) {
             getMenuInflater().inflate(R.menu.menu_tuxedo, menu);
+            listEditEnabled = false;
+            ((TuxedoActivityFragment)fm.findFragmentById(R.id.fragment_container))
+                    .getListView()
+                    .setRearrangeEnabled(listEditEnabled);
         }
         return true;
     }
 
-    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                curFragment = 2;
-                if (fm.getBackStackEntryCount() > 0) {
-                    fm.popBackStack();
-                }
+            case R.id.action_fetch:
+                //do something special for me
                 return true;
+            case R.id.action_edit:
+                listEditEnabled = !listEditEnabled;
+                if (listEditEnabled){
+                    item.setChecked(true);
+                }else{
+                    item.setChecked(false);
+                }
+                ((TuxedoActivityFragment)fm.findFragmentById(R.id.fragment_container))
+                                                    .getListView()
+                                                    .setRearrangeEnabled(listEditEnabled);
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }*/
+    }
 
     @Override
     public void onBackPressed(){
@@ -151,6 +161,7 @@ public class TuxedoActivity extends AppCompatActivity
             View adContainer = findViewById(R.id.ad_container);
             if (adContainer == null){
                 adContainer = new ImageView(this);
+                ((ImageView)adContainer).setAdjustViewBounds(true);
             }
             InlineAd inlineAd = InlineAd.createInstance(getString(R.string.mmedia_apid), (ViewGroup) adContainer);
             final InlineAd.InlineAdMetadata inlineAdMetadata = new InlineAd.InlineAdMetadata().

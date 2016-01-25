@@ -1,7 +1,7 @@
 package com.tk_squared.tuxedo3;
 
 
-import android.app.ListFragment;
+import android.app.Fragment;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.widget.Toolbar;
@@ -16,8 +16,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
 
-public class TuxedoActivityFragment extends ListFragment {
+public class TuxedoActivityFragment extends Fragment implements RearrangeableListView.RearrangeListener{
 
+    private RearrangeableListView listView;
+    public RearrangeableListView getListView(){return listView;}
+    private int position;
     public Callbacks callbacks;
 
     //Interface for handling fragment change on selection
@@ -26,6 +29,33 @@ public class TuxedoActivityFragment extends ListFragment {
     }
 
     public TuxedoActivityFragment() {
+    }
+
+    @Override
+    public void onGrab(int index) {
+        position = index;
+    }
+
+    @Override
+    public boolean onRearrangeRequested(int fromIndex, int toIndex) {
+        if (toIndex > 0 && toIndex < listView.getCount()) {
+            ((TuxedoActivity)getActivity()).getData().moveStation(fromIndex, toIndex);
+            ((ArrayAdapter) listView.getAdapter()).notifyDataSetChanged();
+            position = -1;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onDrop() {
+        if (position > 0) {
+            tkkStation station = (tkkStation) listView.getItemAtPosition(position);
+            if (callbacks == null) {
+                callbacks = (Callbacks) getActivity();
+            }
+            callbacks.onStationSelected(station);
+        }
     }
 
     @Override
@@ -43,12 +73,29 @@ public class TuxedoActivityFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        final TuxedoActivity tuxActivity = (TuxedoActivity)getActivity();
+        listView = (RearrangeableListView) getView().findViewById(R.id.list);
+        if (listView == null){
+            listView = new RearrangeableListView(getActivity());
+        }
 
-        TuxedoActivity tuxActivity = (TuxedoActivity)getActivity();
         ArrayAdapter adapter = new StationAdapter(tuxActivity, tuxActivity.getTkkData());
-        setListAdapter(adapter);
+        listView.setAdapter(adapter);
+        if (((TuxedoActivity) getActivity()).getListEditEnabled()) {
+            listView.setRearrangeEnabled(true);
+        }
+        listView.setRearrangeListener(this);
         callbacks = tuxActivity;
-
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                tkkStation station = (tkkStation) listView.getItemAtPosition(position);
+                if (callbacks == null) {
+                    callbacks = (Callbacks) getActivity();
+                }
+                callbacks.onStationSelected(station);
+            }
+        });
         Toolbar toolbar = (Toolbar) tuxActivity.findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.subtitle);
         tuxActivity.setSupportActionBar(toolbar);
@@ -56,16 +103,7 @@ public class TuxedoActivityFragment extends ListFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState){
-        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                tkkStation station = (tkkStation) getListAdapter().getItem(position);
-                if (callbacks == null) {
-                    callbacks = (Callbacks) getActivity();
-                }
-                callbacks.onStationSelected(station);
-            }
-        });
+
     }
 
     public class StationAdapter extends ArrayAdapter<tkkStation>{
@@ -96,7 +134,7 @@ public class TuxedoActivityFragment extends ListFragment {
                 @Override
                 public void onClick(View v) {
                     ((TuxedoActivity) getActivity()).getData().removeStationAt(position);
-                    ((ArrayAdapter) getListAdapter()).notifyDataSetChanged();
+                    ((ArrayAdapter)listView.getAdapter()).notifyDataSetChanged();
                 }
             });
             return view;

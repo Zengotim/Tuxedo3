@@ -20,8 +20,8 @@
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
     </android.support.design.widget.AppBarLayout>
 
-    <ListView
-        android:id="@android:id/list"
+    <com.tk_squared.tuxedo3.RearrangeableListView
+        android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight=".85"
@@ -29,6 +29,6 @@
         android:dividerHeight="15dp"
         android:clickable="true"
         android:longClickable="true">
-    </ListView>
+    </com.tk_squared.tuxedo3.RearrangeableListView>
 
 </LinearLayout>
