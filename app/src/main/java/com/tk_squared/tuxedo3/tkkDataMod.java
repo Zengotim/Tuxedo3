@@ -13,6 +13,10 @@ import com.millennialmedia.internal.utils.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -49,9 +53,8 @@ public class tkkDataMod {
 
     public class GetServerDataTask extends  AsyncTask<Void, Integer, Integer> {
 
-
         String body;
-
+        Boolean update = false;
         ArrayList<JSONObject> jsons;
 
         public GetServerDataTask(){
@@ -60,6 +63,9 @@ public class tkkDataMod {
 
         @Override
         protected Integer doInBackground(Void... params) {
+            instance.stations = dataSource.getAllStations(_activity);
+            System.out.println(stations.size());
+
             try {
                 URL url = new URL("http://tk-squared.com/tuxedo/googleapitest/stations.json");
                 URLConnection con = url.openConnection();
@@ -67,89 +73,100 @@ public class tkkDataMod {
                 this.body = IOUtils.convertStreamToString(in);
                 String[] lines = this.body.split("~#%#~");
                 String serverListVersion = lines[0];
-                this.body = lines[1];
+                File vFile = new File(_activity.getApplicationContext().getFilesDir(),"tuxedo_server_version.txt");
 
-                lines = this.body.split("-");
+                BufferedReader reader;
+                if(!vFile.exists()) {
+                    vFile.createNewFile();
+                    updateListVersion(vFile, serverListVersion);
+                    update = true;
+                } else {
+                    try{
+                        reader = new BufferedReader(new FileReader(vFile));
+                        String date;
 
-                for(int i = 0; i < lines.length; ++i) {
-  //                  JSONObject json = new JSONObject(lines[i]);
-                    ++tasks;
-
-                    jsons.add(new JSONObject(lines[i]));
+                        while((date = reader.readLine())!= null) {
+                            if (!date.equals(serverListVersion)) {
+                                update = true;
+                                updateListVersion(vFile, serverListVersion);
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.i("FileException", e.toString());
+                    }
                 }
 
-                //this.json = new JSONObject(body);
+                if(update) {
+                    this.body = lines[1];
 
+                    lines = this.body.split("-");
+
+                    for (int i = 0; i < lines.length; ++i) {
+                        ++tasks;
+
+                        jsons.add(new JSONObject(lines[i]));
+                    }
+                }
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                Log.i("IOException", "ITS AN IOEXCEPTION!!");
                 e.printStackTrace();
             } catch (JSONException e) {
+                Log.i("JSONException", "ITS A JSONEXCEPTION!!");
                 e.printStackTrace();
             }
             return null;
         }
 
         protected void onPostExecute(Integer result) {
-          for(int i = 0; i < jsons.size(); ++i) {
-              JSONObject json = jsons.get(i);
-              String name;
-              String url;
-              String iconUrl;
-              try {
-                  name = json.getString("name");
-                  url = json.getString("url");
-                  iconUrl = json.getString("icon");
-                  CreateStationTask worker = new CreateStationTask(name, url, iconUrl);
-                  worker.execute();
-              } catch (JSONException e) {
-                  e.printStackTrace();
-              }
+            if(update){
+                instance.deleteAllStations();
+                for(int i = 0; i < jsons.size(); ++i) {
+                    JSONObject json = jsons.get(i);
+                    String name;
+                    String url;
+                    String iconUrl;
+                    try {
+                        name = json.getString("name");
+                        url = json.getString("url");
+                        iconUrl = json.getString("icon");
+                        CreateStationTask worker = new CreateStationTask(name, url, iconUrl);
+                        worker.execute();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-
-          }
-
-            Log.i("JSON", body);
-        }
-    }
-
-    public class SQLLoadTask extends AsyncTask<Void, Integer, Integer> {
-
-        private ArrayList<tkkStation> stations;
-        private tkkStationsDataSource dataSource;
-        public SQLLoadTask(ArrayList<tkkStation>_stations, tkkStationsDataSource _dataSource){
-            this.stations = _stations;
-            this.dataSource = _dataSource;
-        }
-
-        @Override
-        protected Integer doInBackground(Void... params) {
-            tkkDataMod.instance.setStations(dataSource.getAllStations(_activity));
-            return null;
-        }
-
-        protected void onProgressUpdate(Integer... progress){
+            } else {
+                Callbacks cb = (Callbacks)_activity;
+                cb.onDataLoaded(instance.stations);
+            }
 
         }
 
-        protected void onPostExecute(Integer result){
-
+        private void updateListVersion(File vFile, String sVersion) {
+            FileOutputStream writer;
+            try {
+                writer = new FileOutputStream(vFile, false);
+                writer.write(sVersion.getBytes());
+                writer.flush();
+                writer.close();
+                update = true;
+            } catch (IOException e){
+                Log.i("FOS", "File Writing failed to update server list version");
+            }
         }
     }
 
     public class CreateStationTask extends AsyncTask<Void, Integer, Integer>{
         private BitmapDrawable icon;
         private Bitmap bitmap;
-        private tkkStation station;
         private String name;
         private String iconURL;
         private Uri uri;
-
-        public CreateStationTask(tkkStation station, String iconURL){
-            this.station = station;
-            this.iconURL = iconURL;
-        }
 
         public CreateStationTask(String name, String uri, String iconURL) {
             this.name = name;
@@ -157,10 +174,6 @@ public class tkkDataMod {
             this.uri = Uri.parse(uri);
         }
 
-        public CreateStationTask(tkkStation station, byte[] bytes) {
-            this.station = station;
-            this.bitmap = tkkStationsDataSource.BitmapHelper.getImage(bytes);
-        }
 
         @Override
         protected Integer doInBackground(Void... unused){
@@ -209,38 +222,13 @@ public class tkkDataMod {
     private void genDummyData() {
 
         //TIM COMMENT OUT dataSource.deleteAll(); to test how the app handles getting station data from the DB rather than populating
-        dataSource.deleteAll();
+       // dataSource.deleteAll();
+
+        GetServerDataTask reader = new GetServerDataTask();
+
+        reader.execute();
 
 
-
-        instance.stations = dataSource.getAllStations(_activity);
-
-        if (instance.stations.size() == 0) {
-
-            GetServerDataTask reader = new GetServerDataTask();
-
-            reader.execute();
-            /*
-            for (int i = 1; i < 15; ++i) {
-                String wsbIcon = "http://www.google.com/s2/favicons?domain=wsbradio.com";
-                String wqxrIcon = "http://www.google.com/s2/favicons?domain=wqxr.org";
-
-                CreateStationTask wsb = new CreateStationTask("WSB " + i, "http://m.wsbradio.com/stream/",
-                        wsbIcon);
-                ++tasks;
-                wsb.execute();
-                CreateStationTask wqxr = new CreateStationTask("WQXR" + i, "http://wqxr.org/#!/", wqxrIcon);
-                ++tasks;
-                wqxr.execute();
-
-            }
-            */
-        } else {
-            Callbacks cb = (Callbacks)_activity;
-            cb.onDataLoaded(instance.stations);
-        }
-
-        System.out.println(stations.size());
     }
 
     //Used to create tkkDataMod singleton
@@ -291,6 +279,8 @@ public class tkkDataMod {
         return stations;
     }
 
+
+
     public void setStations(ArrayList<tkkStation> s) {
         if(stations != null){
             stations.clear();
@@ -329,9 +319,17 @@ public class tkkDataMod {
     }
 
     public void removeStationAt(int i){
+
         tkkStation s = stations.get(i);
+        removeStation(s);
         dataSource.deleteStation(s);
         stations.remove(i);
+    }
+
+    public void deleteAllStations() {
+        stations = null;
+        stations = new ArrayList<>();
+        dataSource.deleteAll();
     }
 
     public tkkStation getStationAt(int idx) {
