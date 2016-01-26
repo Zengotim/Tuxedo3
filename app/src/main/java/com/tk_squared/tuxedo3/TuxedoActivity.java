@@ -1,6 +1,7 @@
 package com.tk_squared.tuxedo3;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -11,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 //Millennial Media Ad Support
 import com.millennialmedia.InlineAd;
@@ -30,9 +33,11 @@ public class TuxedoActivity extends AppCompatActivity
     private ArrayList<tkkStation> tkkData;
     public ArrayList<tkkStation> getTkkData() { return tkkData; }
     private FragmentManager fm;
+    private ProgressBar progBar;
     private static final String TAG = "Ad Server message - ";
     private boolean listEditEnabled = false; public boolean getListEditEnabled(){return listEditEnabled;}
     public void setEditEnabled(boolean enableEdit){listEditEnabled = enableEdit;}
+    private Handler handler = new Handler();
 
     public TuxedoActivity() {
     }
@@ -44,12 +49,16 @@ public class TuxedoActivity extends AppCompatActivity
         //Set up ad support
         setMMedia();
         setAdSpace();
+        progBar = (ProgressBar)findViewById(R.id.progress_bar);
+        progBar.setVisibility(View.VISIBLE);
         //Begin app with Splash Screen
         fm = getFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment == null) {
             fragment = new SplashFragment();
-            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
+            fm.beginTransaction()
+                    .add(R.id.fragment_container, fragment)
+                    .commit();
         }
         //Get data model
         tuxData = tkkDataMod.getInstance(this);
@@ -60,10 +69,12 @@ public class TuxedoActivity extends AppCompatActivity
     public void onDataLoaded(ArrayList<tkkStation> stations) {
         //Set data and switch to Listview fragment
         tkkData = stations;
+        progBar.setVisibility(View.GONE);
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (!(fragment instanceof TuxedoActivityFragment)){
             fragment = new TuxedoActivityFragment();
-            fm.beginTransaction().replace(R.id.fragment_container, fragment)
+            fm.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
                     .addToBackStack("ListView")
                     .commit();
         }
@@ -113,6 +124,10 @@ public class TuxedoActivity extends AppCompatActivity
                 ((TuxedoActivityFragment)fm.findFragmentById(R.id.fragment_container))
                                                     .getListView()
                                                     .setRearrangeEnabled(listEditEnabled);
+                return true;
+            case R.id.action_about:
+                displayAbout();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -131,7 +146,28 @@ public class TuxedoActivity extends AppCompatActivity
         }
     }
 
-    //for Ad Support settings
+    //Displays the About screen
+    private void displayAbout(){
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (!(fragment instanceof SplashFragment)){
+            fragment = new SplashFragment();
+            fm.beginTransaction().replace(R.id.fragment_container, fragment)
+                    .addToBackStack("About")
+                    .commit();
+        }
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if (fm.getBackStackEntryCount() > 0){
+                    fm.popBackStack();
+                }
+            }
+        };
+        handler.postDelayed(r, 8000);
+    }
+
+    //region Description: Ad Support settings
     private void setMMedia(){
         MMSDK.initialize(this);
         /*UserData userData = new UserData()
@@ -158,12 +194,12 @@ public class TuxedoActivity extends AppCompatActivity
             // NOTE: The ad container argument passed to the createInstance call should be the
             // view container that the ad content will be injected into.
 
-            View adContainer = findViewById(R.id.ad_container);
+            /*View adContainer = findViewById(R.id.ad_container);
             if (adContainer == null){
                 adContainer = new ImageView(this);
-                ((ImageView)adContainer).setAdjustViewBounds(true);
-            }
-            InlineAd inlineAd = InlineAd.createInstance(getString(R.string.mmedia_apid), (ViewGroup) adContainer);
+            }*/
+            InlineAd inlineAd = InlineAd.createInstance(getString(R.string.mmedia_apid),
+                                            (LinearLayout)findViewById(R.id.ad_container));
             final InlineAd.InlineAdMetadata inlineAdMetadata = new InlineAd.InlineAdMetadata().
                     setAdSize(InlineAd.AdSize.BANNER);
 
@@ -241,4 +277,5 @@ public class TuxedoActivity extends AppCompatActivity
             // abort loading ad
         }
     }
+    //endregion
 }

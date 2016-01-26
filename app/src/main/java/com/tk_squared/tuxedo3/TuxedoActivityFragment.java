@@ -31,6 +31,8 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
     public TuxedoActivityFragment() {
     }
 
+
+    //region Desc: RearrangeableListView Listener interface methods
     @Override
     public void onGrab(int index) {
         position = index;
@@ -57,6 +59,7 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
             callbacks.onStationSelected(station);
         }
     }
+    //endregion
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -99,11 +102,6 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
         Toolbar toolbar = (Toolbar) tuxActivity.findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.subtitle);
         tuxActivity.setSupportActionBar(toolbar);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState){
-
     }
 
     public class StationAdapter extends ArrayAdapter<tkkStation>{

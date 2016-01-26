@@ -9,4 +9,7 @@
     <string name="icon_description">Station Icon</string>
     <string name="splash_description">TK-Squared Logo</string>
     <string name="mmedia_apid">218764</string>
+    <string name="menu_fetch_title">Check For new List</string>
+    <string name="menu_edit_title">Edit List</string>
+    <string name="menu_about_title">About Tuxedo</string>
 </resources>

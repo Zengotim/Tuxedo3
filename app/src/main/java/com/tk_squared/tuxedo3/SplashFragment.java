@@ -1,6 +1,7 @@
 package com.tk_squared.tuxedo3;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +18,6 @@ public class SplashFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //TuxedoActivity activity = (TuxedoActivity)getActivity();
-        //activity.setData(tkkDataMod.getInstance(activity));
         return inflater.inflate(R.layout.fragment_splash, container, false);
     }
 }
