@@ -51,7 +51,7 @@ public class tkkDataMod {
     private int tasks = 0;
     private int completes = 0;
 
-    public class GetServerDataTask extends  AsyncTask<Void, Integer, Integer> {
+    private class GetServerDataTask extends  AsyncTask<Void, Integer, Integer> {
 
         String body;
         Boolean update = false;
@@ -59,6 +59,11 @@ public class tkkDataMod {
 
         public GetServerDataTask(){
             this.jsons = new ArrayList<>();
+        }
+
+        public GetServerDataTask(Boolean u) {
+            this.jsons = new ArrayList<>();
+            this.update = u;
         }
 
         @Override
@@ -76,24 +81,26 @@ public class tkkDataMod {
                 File vFile = new File(_activity.getApplicationContext().getFilesDir(),"tuxedo_server_version.txt");
 
                 BufferedReader reader;
-                if(!vFile.exists()) {
-                    vFile.createNewFile();
-                    updateListVersion(vFile, serverListVersion);
-                    update = true;
-                } else {
-                    try{
-                        reader = new BufferedReader(new FileReader(vFile));
-                        String date;
+                if(!update) {
+                    if (!vFile.exists()) {
+                        vFile.createNewFile();
+                        updateListVersion(vFile, serverListVersion);
+                        update = true;
+                    } else {
+                        try {
+                            reader = new BufferedReader(new FileReader(vFile));
+                            String date;
 
-                        while((date = reader.readLine())!= null) {
-                            if (!date.equals(serverListVersion)) {
-                                update = true;
-                                updateListVersion(vFile, serverListVersion);
-                                break;
+                            while ((date = reader.readLine()) != null) {
+                                if (!date.equals(serverListVersion)) {
+                                    update = true;
+                                    updateListVersion(vFile, serverListVersion);
+                                    break;
+                                }
                             }
+                        } catch (Exception e) {
+                            Log.i("FileException", e.toString());
                         }
-                    } catch (Exception e) {
-                        Log.i("FileException", e.toString());
                     }
                 }
 
@@ -161,8 +168,8 @@ public class tkkDataMod {
         }
     }
 
-    public class CreateStationTask extends AsyncTask<Void, Integer, Integer>{
-        private BitmapDrawable icon;
+    private class CreateStationTask extends AsyncTask<Void, Integer, Integer>{
+
         private Bitmap bitmap;
         private String name;
         private String iconURL;
@@ -183,11 +190,7 @@ public class tkkDataMod {
                     if(iconURL == null)  iconURL = "http://www.google.com/favicon.ico";
                     bitmap = BitmapFactory.decodeStream((InputStream) new URL(iconURL).getContent());
                 }
-                if (bitmap != null) {
-                    //byte[] blob = tkkStationsDataSource.BitmapHelper.getBytes(bitmap);
 
-                    icon = new BitmapDrawable(_activity.getApplicationContext().getResources(), Bitmap.createScaledBitmap(bitmap, 32, 32, false));
-                }
             }
             catch(MalformedURLException e){
                 //do nothing
@@ -217,19 +220,6 @@ public class tkkDataMod {
     private tkkDataMod(){
     }
 
-    //Generates a list of dummy stations for UI testing and functionality
-
-    private void genDummyData() {
-
-        //TIM COMMENT OUT dataSource.deleteAll(); to test how the app handles getting station data from the DB rather than populating
-       // dataSource.deleteAll();
-
-        GetServerDataTask reader = new GetServerDataTask();
-
-        reader.execute();
-
-
-    }
 
     //Used to create tkkDataMod singleton
     public static tkkDataMod getInstance(Activity activity){
@@ -239,8 +229,11 @@ public class tkkDataMod {
             instance.stations = new ArrayList<>();
             // uncomment to delete the database
             //TuxedoActivity.getTuxedoContext().deleteDatabase("stations.db");
+
+
             instance._activity = activity;
             instance.dataSource = new tkkStationsDataSource(instance._activity.getApplicationContext());
+
 
             try {
 
@@ -248,8 +241,9 @@ public class tkkDataMod {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            //Replace genDummyData with real list pull method
-            instance.genDummyData();
+
+           instance.populateStations();
+
             return instance;
         }/* TIM KILL THIS ELSE STATEMENT IF IT CAUSES PROBLEMS */ else {
             instance = null;
@@ -258,17 +252,17 @@ public class tkkDataMod {
 
     }
 
-    //Used to create tkkDataMod singleton
-    public static tkkDataMod getInstance() {
 
-        if(instance == null) {
-            instance = new tkkDataMod();
-            //Replace genDummyData with real list pull method
+    //Called to populate the stations list
+    private void populateStations(){
+        GetServerDataTask reader = new GetServerDataTask(true);
+        reader.execute();
+    }
 
-            instance.genDummyData();
-
-        }
-        return instance;
+    //Deletes current stations list and table entries and pulls fresh list from the server
+    public void repopulateStations(){
+        instance.deleteAllStations();
+        instance.populateStations();
     }
 
     public void destroyInstance(){
