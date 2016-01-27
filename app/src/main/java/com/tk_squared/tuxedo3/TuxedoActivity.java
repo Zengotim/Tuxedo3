@@ -20,6 +20,9 @@ import com.millennialmedia.InlineAd;
 import com.millennialmedia.MMException;
 import com.millennialmedia.MMSDK;
 
+//Facebook
+import com.facebook.FacebookSdk;
+
 public class TuxedoActivity extends AppCompatActivity
         implements TuxedoActivityFragment.Callbacks, tkkDataMod.Callbacks {
 
@@ -49,6 +52,8 @@ public class TuxedoActivity extends AppCompatActivity
         //Set up ad support
         setMMedia();
         setAdSpace();
+        //Initialize Facebook
+        FacebookSdk.sdkInitialize(getApplicationContext());
         progBar = (ProgressBar)findViewById(R.id.progress_bar);
         progBar.setVisibility(View.VISIBLE);
         //Begin app with Splash Screen
