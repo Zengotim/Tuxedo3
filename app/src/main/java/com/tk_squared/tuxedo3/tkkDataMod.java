@@ -193,11 +193,13 @@ public class tkkDataMod {
 
             }
             catch(MalformedURLException e){
+                Log.i("MalformedURLException", e.toString());
                 //do nothing
             }
             catch (IOException e){
                 Log.i("IOException", "IOException: " + e.toString());
-                //Still nothing;
+                Log.i("Tuxedo Icon", "Using Tuxedo icon for station: " + this.name);
+                bitmap = BitmapFactory.decodeResource(_activity.getApplicationContext().getResources(), R.drawable.ic_launcher);
             }
             return 0;
         }
