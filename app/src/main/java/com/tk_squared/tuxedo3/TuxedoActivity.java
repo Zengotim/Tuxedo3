@@ -1,12 +1,19 @@
 package com.tk_squared.tuxedo3;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import android.util.Log;
 import android.view.View;
@@ -24,7 +31,7 @@ import com.millennialmedia.MMSDK;
 import com.facebook.FacebookSdk;
 
 public class TuxedoActivity extends AppCompatActivity
-        implements TuxedoActivityFragment.Callbacks, tkkDataMod.Callbacks {
+        implements TuxedoActivityFragment.Callbacks, tkkDataMod.Callbacks, LoginFragment.Callbacks {
 
     private tkkDataMod tuxData;
     public tkkDataMod getData() {
@@ -60,12 +67,41 @@ public class TuxedoActivity extends AppCompatActivity
         fm = getFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment == null) {
-            fragment = new SplashFragment();
+            //fragment= new LoginFragment();
+           fragment = new SplashFragment();
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
         //Get data model
+
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(
+                    "com.tk_squared.tuxedo3",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                String something = new String(Base64.encode(md.digest(), 0));
+                Log.i("KeyHash:", something);
+                Log.i("KeyHash:", something);
+                Log.i("KeyHash:", something);
+                Log.i("KeyHash:", something);
+                Log.i("KeyHash:", something);
+                Log.i("KeyHash:", something);
+                Log.i("KeyHash:", something);
+                Log.i("KeyHash:", something);
+                Log.i("KeyHash:", something);
+
+            }
+        } catch (PackageManager.NameNotFoundException e1) {
+            Log.e("name not found", e1.toString());
+        } catch (NoSuchAlgorithmException e) {
+            Log.e("no such an algorithm", e.toString());
+        } catch (Exception e) {
+            Log.e("exception", e.toString());
+        }
+
         tuxData = tkkDataMod.getInstance(this);
     }
 
@@ -75,6 +111,19 @@ public class TuxedoActivity extends AppCompatActivity
         //Set data and switch to Listview fragment
         tkkData = stations;
         progBar.setVisibility(View.GONE);
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (!(fragment instanceof LoginFragment)){
+            fragment = new LoginFragment();
+            fm.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack("ListView")
+                    .commit();
+        }
+    }
+
+    //Callback method for LoginFragment.Callbacks
+    @Override
+    public void onSkip(){
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (!(fragment instanceof TuxedoActivityFragment)){
             fragment = new TuxedoActivityFragment();

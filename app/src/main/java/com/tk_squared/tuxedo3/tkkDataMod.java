@@ -107,7 +107,7 @@ public class tkkDataMod {
                 if(update) {
                     this.body = lines[1];
 
-                    lines = this.body.split("-");
+                    lines = this.body.split("~~@~~");
 
                     for (int i = 0; i < lines.length; ++i) {
                         ++tasks;
@@ -257,14 +257,15 @@ public class tkkDataMod {
 
     //Called to populate the stations list
     private void populateStations(){
-        GetServerDataTask reader = new GetServerDataTask(true);
+        GetServerDataTask reader = new GetServerDataTask();
         reader.execute();
     }
 
     //Deletes current stations list and table entries and pulls fresh list from the server
     public void repopulateStations(){
         instance.deleteAllStations();
-        instance.populateStations();
+        GetServerDataTask reader = new GetServerDataTask(true);
+        reader.execute();
     }
 
     public void destroyInstance(){
