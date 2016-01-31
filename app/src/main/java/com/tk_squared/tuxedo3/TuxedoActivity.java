@@ -1,5 +1,6 @@
 package com.tk_squared.tuxedo3;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -23,6 +24,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 //Millennial Media Ad Support
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
 import com.millennialmedia.InlineAd;
 import com.millennialmedia.MMException;
 import com.millennialmedia.MMSDK;
@@ -48,6 +51,7 @@ public class TuxedoActivity extends AppCompatActivity
     private boolean listEditEnabled = false; public boolean getListEditEnabled(){return listEditEnabled;}
     public void setEditEnabled(boolean enableEdit){listEditEnabled = enableEdit;}
     private Handler handler = new Handler();
+    private CallbackManager callbackManager;
 
     public TuxedoActivity() {
     }
@@ -61,6 +65,7 @@ public class TuxedoActivity extends AppCompatActivity
         setAdSpace();
         //Initialize Facebook
         FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
         progBar = (ProgressBar)findViewById(R.id.progress_bar);
         progBar.setVisibility(View.VISIBLE);
         //Begin app with Splash Screen
@@ -108,22 +113,29 @@ public class TuxedoActivity extends AppCompatActivity
     //Callback method for tkkDataMod.Callbacks
     @Override
     public void onDataLoaded(ArrayList<tkkStation> stations) {
-        //Set data and switch to Listview fragment
+        //Set data and switch to Facebook Login fragment
         tkkData = stations;
         progBar.setVisibility(View.GONE);
+        if(isLoggedIn()){
+            onLoginFinish();
+        } else {
+            callLoginFragment();
+        }
+    }
+
+    private void callLoginFragment(){
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (!(fragment instanceof LoginFragment)){
             fragment = new LoginFragment();
             fm.beginTransaction()
                     .replace(R.id.fragment_container, fragment)
-                    .addToBackStack("ListView")
                     .commit();
         }
     }
 
     //Callback method for LoginFragment.Callbacks
     @Override
-    public void onSkip(){
+    public void onLoginFinish(){
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (!(fragment instanceof TuxedoActivityFragment)){
             fragment = new TuxedoActivityFragment();
@@ -132,6 +144,11 @@ public class TuxedoActivity extends AppCompatActivity
                     .addToBackStack("ListView")
                     .commit();
         }
+    }
+
+    public boolean isLoggedIn() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        return accessToken != null;
     }
 
     //Callback method for TuxedoActivityFragment.Callbacks
@@ -149,6 +166,8 @@ public class TuxedoActivity extends AppCompatActivity
                     .commit();
         }
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -332,4 +351,8 @@ public class TuxedoActivity extends AppCompatActivity
         }
     }
     //endregion
+
+    public CallbackManager getCallbackManager(){
+        return callbackManager;
+    }
 }

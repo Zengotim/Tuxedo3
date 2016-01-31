@@ -1,84 +1,107 @@
 package com.tk_squared.tuxedo3;
 
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.facebook.CallbackManager;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link LoginFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link LoginFragment#newInstance} factory method to
- * create an instance of this fragment.
- *
- */
 public class LoginFragment extends Fragment {
     private LoginButton loginButton;
     private Button skipButton;
     public Callbacks callbacks;
+   // private CallbackManager callbackManager;
+    private TextView info;
 
     public interface Callbacks{
-        void onSkip();
+        void onLoginFinish();
     }
     public LoginFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+
+
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final TuxedoActivity tuxedoActivity = (TuxedoActivity)getActivity();
+
+
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-        view.setBackgroundColor(Color.BLACK);
+       // view.setBackgroundColor(Color.BLACK);
+       // tuxedoActivity.setContentView(view);
         skipButton = (Button) view.findViewById(R.id.skip_button);
         if(skipButton == null) skipButton = new Button(getActivity());
+
+        info = (TextView)view.findViewById(R.id.info);
+        if(info == null) info = new TextView(getActivity());
+        info.setTextColor(Color.rgb(200, 0, 0));
+
+        loginButton = (LoginButton)view.findViewById(R.id.login_button);
+        loginButton.setReadPermissions("user_friends");
+        loginButton.setFragment(this);
 
         callbacks = tuxedoActivity;
 
         skipButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 callbacks = (Callbacks) getActivity();
-                callbacks.onSkip();
+                callbacks.onLoginFinish();
             }
         });
-       /*
-        loginButton = (LoginButton) view.findViewById(R.id.login_button);
-        loginButton.setReadPermissions("user_friends");
-        // If using in a fragment
-        loginButton.setFragment(this);
 
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+        loginButton.registerCallback(tuxedoActivity.getCallbackManager(), new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // App code
+                Log.i("LOGIN", "Facebook logged in");
+                callbacks.onLoginFinish();
+                info.setText(
+                        "User ID: "
+                                + loginResult.getAccessToken().getUserId()
+                                + "\n" +
+                                "Auth Token: "
+                                + loginResult.getAccessToken().getToken()
+                );
             }
 
             @Override
             public void onCancel() {
-                // App code
+                info.setText("Login attempt canceled.");
             }
 
             @Override
-            public void onError(FacebookException exception) {
-                // App code
-            }
-        }
+            public void onError(FacebookException e) {
 
-*/
+                info.setText("Login attempt failed.");
+            }
+        });
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        final TuxedoActivity tuxedoActivity = (TuxedoActivity)getActivity();
+        tuxedoActivity.getCallbackManager().onActivityResult(requestCode,
+                resultCode, data);
     }
 }

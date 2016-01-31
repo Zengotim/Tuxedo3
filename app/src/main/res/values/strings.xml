@@ -13,6 +13,7 @@
     <string name="menu_edit_title">Edit List</string>
     <string name="menu_about_title">About Tuxedo</string>
     <string name="skip_login">Skip</string>
+    <string name="facebook_app_id">1511621782474272</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
