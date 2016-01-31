@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.tk_squared.tuxedo3.TuxedoActivity">
+
+    <item
+        android:id="@+id/action_facebook_share"
+        android:icon="@drawable/ic_action_share"
+        android:title="@string/com_facebook_share_button_text"
+        app:showAsAction="ifRoom"/>
+
+</menu>

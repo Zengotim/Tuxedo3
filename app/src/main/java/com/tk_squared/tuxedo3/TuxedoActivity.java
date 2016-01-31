@@ -1,6 +1,5 @@
 package com.tk_squared.tuxedo3;
 
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -18,8 +17,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
@@ -171,12 +168,16 @@ public class TuxedoActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
-        if (fm.findFragmentById(R.id.fragment_container) instanceof TuxedoActivityFragment) {
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (fragment instanceof TuxedoActivityFragment) {
             getMenuInflater().inflate(R.menu.menu_tuxedo, menu);
             listEditEnabled = false;
-            ((TuxedoActivityFragment)fm.findFragmentById(R.id.fragment_container))
+            ((TuxedoActivityFragment) fragment)
                     .getListView()
                     .setRearrangeEnabled(listEditEnabled);
+        } else if (fragment instanceof  TuxedoWebViewFragment) {
+            getMenuInflater().inflate(R.menu.menu_webview, menu);
+          //  ((TuxedoWebViewFragment) fragment).onShareStation();
         }
         return true;
     }
@@ -200,6 +201,9 @@ public class TuxedoActivity extends AppCompatActivity
                 return true;
             case R.id.action_about:
                 displayAbout();
+                return true;
+            case R.id.action_facebook_share:
+                ((TuxedoWebViewFragment)fm.findFragmentById(R.id.fragment_container)).onShareStation();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
