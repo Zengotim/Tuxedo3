@@ -319,8 +319,7 @@ public class tkkDataMod {
 
         tkkStation s = stations.get(i);
         removeStation(s);
-        dataSource.deleteStation(s);
-        stations.remove(i);
+
     }
 
     public void deleteAllStations() {
