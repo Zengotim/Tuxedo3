@@ -194,7 +194,8 @@ public class tkkStationsDataSource {
         Bitmap bmp = tkkStationsDataSource.BitmapHelper.getImage(i);
         BitmapDrawable icon = null;
         if (bmp != null) {
-            icon = new BitmapDrawable(activity.getApplicationContext().getResources(), Bitmap.createScaledBitmap(bmp, 96, 96, false));
+            icon = new BitmapDrawable(activity.getApplicationContext().getResources(),
+                    Bitmap.createScaledBitmap(bmp, 64, 64, false));
         }
         return new tkkStation(cursor.getLong(0), cursor.getString(3), icon, Uri.parse(cursor.getString(2)));
     }

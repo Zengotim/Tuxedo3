@@ -1,7 +1,6 @@
 package com.tk_squared.tuxedo3;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

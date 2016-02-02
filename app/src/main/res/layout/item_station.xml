@@ -5,14 +5,22 @@
     android:layout_height="match_parent"
     android:background="@drawable/effects_theme"
     android:clickable="false">
-    <ImageView
-        android:id="@+id/station_icon"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="0.1"
+        android:orientation="vertical"
         android:layout_gravity="start"
-        android:src="@drawable/ic_launcher"
-        android:contentDescription="@string/icon_description"/>
+        android:paddingStart="5dp"
+        android:paddingLeft="5dp">
+        <ImageView
+            android:id="@+id/station_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="0.1"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_launcher"
+            android:contentDescription="@string/icon_description"/>
+    </LinearLayout>
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"

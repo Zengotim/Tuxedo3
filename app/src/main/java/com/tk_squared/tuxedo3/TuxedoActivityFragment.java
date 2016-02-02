@@ -84,9 +84,7 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
 
         ArrayAdapter adapter = new StationAdapter(tuxActivity, tuxActivity.getTkkData());
         listView.setAdapter(adapter);
-        if (((TuxedoActivity) getActivity()).getListEditEnabled()) {
-            listView.setRearrangeEnabled(true);
-        }
+        listView.setRearrangeEnabled(((TuxedoActivity) getActivity()).getListEditEnabled());
         listView.setRearrangeListener(this);
         callbacks = tuxActivity;
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

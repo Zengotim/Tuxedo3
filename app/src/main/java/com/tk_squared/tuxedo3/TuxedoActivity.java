@@ -133,6 +133,7 @@ public class TuxedoActivity extends AppCompatActivity
     //Callback method for LoginFragment.Callbacks
     @Override
     public void onLoginFinish(){
+        Log.i("onLoginFinished", "it did call the method!");
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (!(fragment instanceof TuxedoActivityFragment)){
             fragment = new TuxedoActivityFragment();
@@ -157,6 +158,7 @@ public class TuxedoActivity extends AppCompatActivity
             fragment = new TuxedoWebViewFragment();
             Bundle args = new Bundle();
             args.putString("uri", station.getUri().toString());
+            args.putString("name", station.getName());
             fragment.setArguments(args);
             fm.beginTransaction().replace(R.id.fragment_container, fragment)
                     .addToBackStack("webView")
@@ -186,7 +188,7 @@ public class TuxedoActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_fetch:
-                //do something special for me
+                tuxData.repopulateStations();
                 return true;
             case R.id.action_edit:
                 listEditEnabled = !listEditEnabled;
@@ -217,6 +219,9 @@ public class TuxedoActivity extends AppCompatActivity
                 ((TuxedoWebViewFragment) fragment).getWebview().canGoBack()){
             ((TuxedoWebViewFragment) fragment).getWebview().goBack();
         }else if (fm.getBackStackEntryCount() > 1){
+            if (fragment instanceof TuxedoWebViewFragment){
+                ((TuxedoWebViewFragment) fragment).getWebview().destroy();
+            }
             fm.popBackStack();
         }else{
             super.onBackPressed();

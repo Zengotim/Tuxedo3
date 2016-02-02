@@ -26,9 +26,7 @@
         android:layout_height="0dp"
         android:layout_weight=".85"
         android:divider="@drawable/divider_gradient"
-        android:dividerHeight="15dp"
-        android:clickable="true"
-        android:longClickable="true">
+        android:dividerHeight="15dp">
     </com.tk_squared.tuxedo3.RearrangeableListView>
 
 </LinearLayout>
