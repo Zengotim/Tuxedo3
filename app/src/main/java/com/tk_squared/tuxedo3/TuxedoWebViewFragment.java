@@ -51,7 +51,7 @@ public class TuxedoWebViewFragment extends Fragment{
 
         activity.setSupportActionBar(toolbar);
 
-        //shareDialog = new ShareDialog(this);
+        shareDialog = new ShareDialog(this);
 
     }
 
@@ -89,20 +89,24 @@ public class TuxedoWebViewFragment extends Fragment{
     private void setupWebView(){
         //Setup the WebView
 
-        webview = (WebView) getView().findViewById(R.id.webview_view);
-        webview.getSettings().setJavaScriptEnabled(true);
-        webview.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return false;
-            }
-        });
+        if(webview== null) {
+            webview = (WebView) getView().findViewById(R.id.webview_view);
+            webview.getSettings().setJavaScriptEnabled(true);
+            webview.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    view.loadUrl(url);
+                    return false;
+                }
+            });
 
-        currentName = getArguments().getString("name");
-        currentUrl = getArguments().getString("uri");
-        webview.loadUrl(currentUrl);
-        Log.i("URL", currentUrl);
+            currentName = getArguments().getString("name");
+            currentUrl = getArguments().getString("uri");
+            webview.loadUrl(currentUrl);
+            Log.i("URL", currentUrl);
+        } else {
+            Log.i("WebView: ", "webview isn't null, bro");
+        }
     }
 
     public void prepShareDialog(){
@@ -121,7 +125,7 @@ public class TuxedoWebViewFragment extends Fragment{
                 shareDialog.registerCallback(tuxedoActivity.getCallbackManager(), new FacebookCallback<Sharer.Result>() {
                     @Override
                     public void onSuccess(Sharer.Result shareResult) {
-                        bringBackWebView();
+                        //bringBackWebView();
                         Log.i("Share Success", "Shared to facebook");
                     }
 
@@ -133,12 +137,12 @@ public class TuxedoWebViewFragment extends Fragment{
                         } catch(Exception e) {
                             Log.i("webview.getTitle(): ", e.toString());
                         }
-                        bringBackWebView();
+                       // bringBackWebView();
                     }
 
                     @Override
                     public void onError(FacebookException e) {
-                        bringBackWebView();
+                       // bringBackWebView();
                         Log.i("Error", "Error");
                     }
 

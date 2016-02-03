@@ -33,16 +33,10 @@ import java.util.ArrayList;
 
 public class tkkDataMod {
 
-    //TODO Hi Kevin I changed this naming for reasons you may feel free to ask about
     public interface Callbacks {
         void onDataLoaded(ArrayList<tkkStation> _stations);
     }
-    /*
-    //TODO Hi again Kevin I created this one for you to call for progress bar update
-    public interface ProgressUpdate {
-        void onProgressUpdate(float progress);
-    }
-    */
+
 
     private static tkkDataMod instance = null;
     private ArrayList<tkkStation> stations;
@@ -318,8 +312,9 @@ public class tkkDataMod {
     public void removeStationAt(int i){
 
         tkkStation s = stations.get(i);
-        removeStation(s);
-
+       // removeStation(s);
+        dataSource.deleteStation(s);
+        stations.remove(i);
     }
 
     public void deleteAllStations() {
