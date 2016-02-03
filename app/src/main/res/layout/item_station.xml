@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="48dp"
     android:background="@drawable/effects_theme"
     android:clickable="false">
     <LinearLayout
@@ -24,7 +24,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="48dp"
         android:layout_weight="0.6"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
@@ -52,6 +52,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="end"
-        android:background="@drawable/delete_button"/>
+        android:background="@drawable/delete_button"
+        android:clickable="true"/>
 
 </LinearLayout>

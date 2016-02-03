@@ -31,6 +31,7 @@ import com.facebook.share.widget.ShareDialog;
 @SuppressLint("SetJavaScriptEnabled")
 public class TuxedoWebViewFragment extends Fragment{
 
+    //region Description: Variables and Constructor
     private WebView webview; public WebView getWebview(){ return webview;}
     private ShareDialog shareDialog;
     private ShareLinkContent linkContent;
@@ -39,20 +40,19 @@ public class TuxedoWebViewFragment extends Fragment{
 
     public TuxedoWebViewFragment(){}
 
+    //endregion
 
-
+    //region Description: Lifecycle and Super Overrides
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
+        //Make a toolbar
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.webview_toolbar);
         toolbar.setSubtitle(R.string.subtitle);
         AppCompatActivity activity = (AppCompatActivity)getActivity();
-
-
         activity.setSupportActionBar(toolbar);
-
+        //Initialize the Facebook Share Dialog
         shareDialog = new ShareDialog(this);
-
     }
 
     @Override
@@ -61,8 +61,9 @@ public class TuxedoWebViewFragment extends Fragment{
         return inflater.inflate(R.layout.fragment_webview, container, false);
     }
 
-    public void onShareStation(){
-        ShareDialog.show(this, linkContent);
+    @Override
+    public void onPause(){
+        super.onPause();
     }
 
     @Override
@@ -75,17 +76,14 @@ public class TuxedoWebViewFragment extends Fragment{
     }
 
     @Override
-    public void onPause(){
-        super.onPause();
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ((TuxedoActivity)getActivity()).getCallbackManager().onActivityResult(requestCode, resultCode, data);
 
     }
+    //endregion
 
+    //region Description: private methods for setups
     private void setupWebView(){
         //Setup the WebView
 
@@ -109,11 +107,15 @@ public class TuxedoWebViewFragment extends Fragment{
         }
     }
 
+    public void onShareStation(){
+        ShareDialog.show(this, linkContent);
+    }
+
     public void prepShareDialog(){
         final TuxedoActivity tuxedoActivity = (TuxedoActivity)getActivity();
         try {
             if (ShareDialog.canShow(ShareLinkContent.class)) {
-
+                //Create the post
                 String description = "Listen to " + currentName + " on Tuxedo!";
                 linkContent = new ShareLinkContent.Builder()
                         .setContentTitle(currentName)
@@ -121,11 +123,10 @@ public class TuxedoWebViewFragment extends Fragment{
                         .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.tk_squared.tuxedo3"))
                         .setImageUrl(Uri.parse("http://www.tk-squared.com/tux_banner.png"))
                         .build();
-
+                //Sharing callbacks
                 shareDialog.registerCallback(tuxedoActivity.getCallbackManager(), new FacebookCallback<Sharer.Result>() {
                     @Override
                     public void onSuccess(Sharer.Result shareResult) {
-                        //bringBackWebView();
                         Log.i("Share Success", "Shared to facebook");
                     }
 
@@ -137,17 +138,11 @@ public class TuxedoWebViewFragment extends Fragment{
                         } catch(Exception e) {
                             Log.i("webview.getTitle(): ", e.toString());
                         }
-                       // bringBackWebView();
                     }
 
                     @Override
                     public void onError(FacebookException e) {
-                       // bringBackWebView();
                         Log.i("Error", "Error");
-                    }
-
-                    private void bringBackWebView(){
-                        tuxedoActivity.onBackPressed();
                     }
                 });
 
@@ -156,4 +151,5 @@ public class TuxedoWebViewFragment extends Fragment{
             Log.e("ShareDialogError: ", e.toString());
         }
     }
+    //endregion
 }

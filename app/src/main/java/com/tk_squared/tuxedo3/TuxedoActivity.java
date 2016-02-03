@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 
 //Millennial Media Ad Support
@@ -33,50 +34,241 @@ import com.facebook.FacebookSdk;
 public class TuxedoActivity extends AppCompatActivity
         implements TuxedoActivityFragment.Callbacks, tkkDataMod.Callbacks, LoginFragment.Callbacks {
 
+    //region Description: Variables and Accessors
     private tkkDataMod tuxData;
     public tkkDataMod getData() {
         return tuxData;
     }
-    public void setData(tkkDataMod data) {
+        public void setData(tkkDataMod data) {
         tuxData = data;
     }
     private ArrayList<tkkStation> tkkData;
-    public ArrayList<tkkStation> getTkkData() { return tkkData; }
+        public ArrayList<tkkStation> getTkkData() { return tkkData; }
     private FragmentManager fm;
     private ProgressBar progBar;
     private static final String TAG = "Ad Server message - ";
-    private boolean listEditEnabled = false; public boolean getListEditEnabled(){return listEditEnabled;}
-    public void setEditEnabled(boolean enableEdit){listEditEnabled = enableEdit;}
+    private boolean listEditEnabled = false;
+        public boolean getListEditEnabled(){return listEditEnabled;}
+        public void setEditEnabled(boolean enableEdit){listEditEnabled = enableEdit;}
     private Handler handler = new Handler();
     private CallbackManager callbackManager;
+        public CallbackManager getCallbackManager(){return callbackManager;}
+
+    public boolean isLoggedIn() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        return accessToken != null;
+    }
+    //endregion
 
     public TuxedoActivity() {
     }
 
+    //region Description: Lifecycle and Super Overrides
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tuxedo);
+
+        //Show Splashscreen and progress indicator
+        progBar = (ProgressBar)findViewById(R.id.progress_bar);
+        progBar.setVisibility(View.VISIBLE);
+        fm = getFragmentManager();
+        displaySplashFragment();
+
         //Set up ad support
         setMMedia();
         setAdSpace();
+
         //Initialize Facebook
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
-        progBar = (ProgressBar)findViewById(R.id.progress_bar);
-        progBar.setVisibility(View.VISIBLE);
-        //Begin app with Splash Screen
-        fm = getFragmentManager();
+        setupFacebook();
+
+        //Get data model
+        tuxData = tkkDataMod.getInstance(this);
+    }
+
+    @Override
+    public void onBackPressed(){
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (fragment instanceof TuxedoWebViewFragment &&
+                ((TuxedoWebViewFragment) fragment).getWebview().canGoBack()){
+            ((TuxedoWebViewFragment) fragment).getWebview().goBack();
+        }else if (fm.getBackStackEntryCount() > 1){
+            if (fragment instanceof TuxedoWebViewFragment){
+                ((TuxedoWebViewFragment) fragment).getWebview().destroy();
+            }
+            fm.popBackStack();
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (fragment instanceof TuxedoActivityFragment) {
+            getMenuInflater().inflate(R.menu.menu_tuxedo, menu);
+            listEditEnabled = false;
+            ((TuxedoActivityFragment) fragment)
+                    .getListView()
+                    .setRearrangeEnabled(listEditEnabled);
+        } else if (fragment instanceof  TuxedoWebViewFragment) {
+            getMenuInflater().inflate(R.menu.menu_webview, menu);
+            //  ((TuxedoWebViewFragment) fragment).onShareStation();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_fetch:
+                tuxData.repopulateStations();
+                return true;
+            case R.id.action_edit:
+                listEditEnabled = !listEditEnabled;
+                if (listEditEnabled){
+                    item.setChecked(true);
+                }else{
+                    item.setChecked(false);
+                }
+                TuxedoActivityFragment fragment =
+                        ((TuxedoActivityFragment) fm.findFragmentById(R.id.fragment_container));
+                fragment.getListView()
+                        .setRearrangeEnabled(listEditEnabled);
+                setDeleteButtons(fragment);
+                return true;
+            case R.id.action_about:
+                displayAbout();
+                return true;
+            case R.id.action_facebook_share:
+                ((TuxedoWebViewFragment)fm.findFragmentById(R.id.fragment_container)).onShareStation();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    //endregion
+
+    //region Description: Fragment handling
+    private void displayLoginFragment(){
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (!(fragment instanceof LoginFragment)){
+            fragment = new LoginFragment();
+            fm.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .commit();
+        }
+    }
+
+    private void displaySplashFragment(){
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment == null) {
-            //fragment= new LoginFragment();
-           fragment = new SplashFragment();
+            fragment = new SplashFragment();
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
-        //Get data model
+    }
 
+    //Displays the About screen
+    private void displayAbout(){
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (!(fragment instanceof SplashFragment)){
+            fragment = new SplashFragment();
+            fm.beginTransaction().replace(R.id.fragment_container, fragment)
+                    .addToBackStack("About")
+                    .commit();
+        }
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if (fm.getBackStackEntryCount() > 1){
+                    fm.popBackStack();
+                }
+            }
+        };
+        handler.postDelayed(r, 8000);
+    }
+
+    private void displayListView(){
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (!(fragment instanceof TuxedoActivityFragment)){
+            fragment = new TuxedoActivityFragment();
+            fm.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack("ListView")
+                    .commit();
+        }
+    }
+
+    private void displayWebView(tkkStation station){
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (!(fragment instanceof TuxedoWebViewFragment)) {
+            fragment = new TuxedoWebViewFragment();
+            Bundle args = new Bundle();
+            args.putString("uri", station.getUri().toString());
+            args.putString("name", station.getName());
+            fragment.setArguments(args);
+            fm.beginTransaction().replace(R.id.fragment_container, fragment)
+                    .addToBackStack("webView")
+                    .commit();
+        }
+    }
+    //endregion
+
+    //region Description: Interface methods
+    //Callback method for LoginFragment.Callbacks
+    @Override
+    public void onLoginFinish(){
+        displayListView();
+    }
+
+    //Callback method for TuxedoActivityFragment.Callbacks
+    @Override
+    public void onStationSelected(tkkStation station) {
+        //Change to WebView to view selected station
+        displayWebView(station);
+    }
+
+    //Callback method for tkkDataMod.Callbacks
+    @Override
+    public void onDataLoaded(ArrayList<tkkStation> stations) {
+        //Set data and switch to Facebook Login fragment
+        tkkData = stations;
+        progBar.setVisibility(View.GONE);
+        if(isLoggedIn()){
+            onLoginFinish();
+        } else {
+            displayLoginFragment();
+        }
+    }
+    //endregion
+
+    //region Description: Private methods for utility
+    //Method for setting visibility for delete buttons
+    //Seeing as how I can't seem to make them work in the edit mode
+    private void setDeleteButtons(TuxedoActivityFragment fragment){
+
+        ListView listView = fragment.getListView();
+        ((TuxedoActivityFragment.StationAdapter)(listView.getAdapter())).setShowDelete(!listEditEnabled);
+
+        for( int i = 0; i < listView.getCount(); i++) {
+            View row = listView.getChildAt(i);
+            if (row != null) {
+                if (listEditEnabled) {
+                    row.findViewById(R.id.delete_button).setVisibility(View.GONE);
+                } else {
+                    row.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    }
+
+    private void setupFacebook(){
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "com.tk_squared.tuxedo3",
@@ -103,151 +295,8 @@ public class TuxedoActivity extends AppCompatActivity
         } catch (Exception e) {
             Log.e("exception", e.toString());
         }
-
-        tuxData = tkkDataMod.getInstance(this);
     }
-
-    //Callback method for tkkDataMod.Callbacks
-    @Override
-    public void onDataLoaded(ArrayList<tkkStation> stations) {
-        //Set data and switch to Facebook Login fragment
-        tkkData = stations;
-        progBar.setVisibility(View.GONE);
-        if(isLoggedIn()){
-            onLoginFinish();
-        } else {
-            callLoginFragment();
-        }
-    }
-
-    private void callLoginFragment(){
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (!(fragment instanceof LoginFragment)){
-            fragment = new LoginFragment();
-            fm.beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .commit();
-        }
-    }
-
-    //Callback method for LoginFragment.Callbacks
-    @Override
-    public void onLoginFinish(){
-        Log.i("onLoginFinished", "it did call the method!");
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (!(fragment instanceof TuxedoActivityFragment)){
-            fragment = new TuxedoActivityFragment();
-            fm.beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack("ListView")
-                    .commit();
-        }
-    }
-
-    public boolean isLoggedIn() {
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        return accessToken != null;
-    }
-
-    //Callback method for TuxedoActivityFragment.Callbacks
-    @Override
-    public void onStationSelected(tkkStation station) {
-        //Change to WebView to view selected station
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (!(fragment instanceof TuxedoWebViewFragment)) {
-            fragment = new TuxedoWebViewFragment();
-            Bundle args = new Bundle();
-            args.putString("uri", station.getUri().toString());
-            args.putString("name", station.getName());
-            fragment.setArguments(args);
-            fm.beginTransaction().replace(R.id.fragment_container, fragment)
-                    .addToBackStack("webView")
-                    .commit();
-        }
-    }
-
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (fragment instanceof TuxedoActivityFragment) {
-            getMenuInflater().inflate(R.menu.menu_tuxedo, menu);
-            listEditEnabled = false;
-            ((TuxedoActivityFragment) fragment)
-                    .getListView()
-                    .setRearrangeEnabled(listEditEnabled);
-        } else if (fragment instanceof  TuxedoWebViewFragment) {
-            getMenuInflater().inflate(R.menu.menu_webview, menu);
-          //  ((TuxedoWebViewFragment) fragment).onShareStation();
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_fetch:
-                tuxData.repopulateStations();
-                return true;
-            case R.id.action_edit:
-                listEditEnabled = !listEditEnabled;
-                if (listEditEnabled){
-                    item.setChecked(true);
-                }else{
-                    item.setChecked(false);
-                }
-                ((TuxedoActivityFragment)fm.findFragmentById(R.id.fragment_container))
-                                                    .getListView()
-                                                    .setRearrangeEnabled(listEditEnabled);
-                return true;
-            case R.id.action_about:
-                displayAbout();
-                return true;
-            case R.id.action_facebook_share:
-                ((TuxedoWebViewFragment)fm.findFragmentById(R.id.fragment_container)).onShareStation();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public void onBackPressed(){
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (fragment instanceof TuxedoWebViewFragment &&
-                ((TuxedoWebViewFragment) fragment).getWebview().canGoBack()){
-            ((TuxedoWebViewFragment) fragment).getWebview().goBack();
-        }else if (fm.getBackStackEntryCount() > 1){
-            if (fragment instanceof TuxedoWebViewFragment){
-                ((TuxedoWebViewFragment) fragment).getWebview().destroy();
-            }
-            fm.popBackStack();
-        }else{
-            super.onBackPressed();
-        }
-    }
-
-    //Displays the About screen
-    private void displayAbout(){
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (!(fragment instanceof SplashFragment)){
-            fragment = new SplashFragment();
-            fm.beginTransaction().replace(R.id.fragment_container, fragment)
-                    .addToBackStack("About")
-                    .commit();
-        }
-
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                if (fm.getBackStackEntryCount() > 0){
-                    fm.popBackStack();
-                }
-            }
-        };
-        handler.postDelayed(r, 8000);
-    }
+    //endregion
 
     //region Description: Ad Support settings
     private void setMMedia(){
@@ -360,8 +409,4 @@ public class TuxedoActivity extends AppCompatActivity
         }
     }
     //endregion
-
-    public CallbackManager getCallbackManager(){
-        return callbackManager;
-    }
 }

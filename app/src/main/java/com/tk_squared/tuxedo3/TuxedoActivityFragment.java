@@ -18,10 +18,11 @@ import java.util.ArrayList;
 
 public class TuxedoActivityFragment extends Fragment implements RearrangeableListView.RearrangeListener{
 
+    //region Description: Variable and Interface declarations
     private RearrangeableListView listView;
-    public RearrangeableListView getListView(){return listView;}
+        public RearrangeableListView getListView(){return listView;}
     private int position;
-    public Callbacks callbacks;
+    private Callbacks callbacks;
 
     //Interface for handling fragment change on selection
     public interface Callbacks{
@@ -30,16 +31,19 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
 
     public TuxedoActivityFragment() {
     }
+    //endregion
 
 
     //region Desc: RearrangeableListView Listener interface methods
     @Override
     public void onGrab(int index) {
+        //Record what station we're dealing with
         position = index;
     }
 
     @Override
     public boolean onRearrangeRequested(int fromIndex, int toIndex) {
+        //If data is valid, move it
         if (toIndex > 0 && toIndex < listView.getCount()) {
             ((TuxedoActivity)getActivity()).getData().moveStation(fromIndex, toIndex);
             ((ArrayAdapter) listView.getAdapter()).notifyDataSetChanged();
@@ -51,6 +55,7 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
 
     @Override
     public void onDrop() {
+        //If nothing moved, view the station
         if (position > 0) {
             tkkStation station = (tkkStation) listView.getItemAtPosition(position);
             if (callbacks == null) {
@@ -61,6 +66,7 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
     }
     //endregion
 
+    //region Description: Lifecycle and Super Override methods
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -101,12 +107,19 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
         toolbar.setSubtitle(R.string.subtitle);
         tuxActivity.setSupportActionBar(toolbar);
     }
+    //endregion
 
+    //Adapter class for the ListView
     public class StationAdapter extends ArrayAdapter<tkkStation>{
+
+        //region Description: Variables and Constructor
+        private boolean showDelete = true;
+            public void setShowDelete(boolean show){showDelete = show;}
 
         public StationAdapter(Context context, ArrayList<tkkStation> list){
             super(context, 0, list);
         }
+        //endregion
 
         @Override
         public View getView(final int position, View view, ViewGroup parent){
@@ -120,17 +133,25 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
             //Populate data
             ((TextView)view.findViewById(R.id.station_title)).setText(station.getName());
             ((TextView) view.findViewById(R.id.station_subtitle)).setText(station.getUri().toString());
+            //Station icon
             BitmapDrawable icon = station.getIcon();
             if (icon != null){
                 ((ImageView) view.findViewById(R.id.station_icon)).setImageDrawable(station.getIcon());
             }
+            //Delete Button
             Button deleteButton = (Button)view.findViewById(R.id.delete_button);
             deleteButton.setFocusable(false);
+            deleteButton.setClickable(showDelete);
+            if (showDelete) {
+                deleteButton.setVisibility(View.VISIBLE);
+            }else{
+                deleteButton.setVisibility(View.GONE);
+            }
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ((TuxedoActivity) getActivity()).getData().removeStationAt(position);
-                    ((ArrayAdapter)listView.getAdapter()).notifyDataSetChanged();
+                    notifyDataSetChanged();
                 }
             });
             return view;
