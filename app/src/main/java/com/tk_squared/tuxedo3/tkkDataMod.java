@@ -66,13 +66,13 @@ public class tkkDataMod {
             System.out.println(stations.size());
 
             try {
-                URL url = new URL("http://tk-squared.com/tuxedo/googleapitest/stations.json");
+                URL url = new URL("http://tk-squared.com/Tuxedo/stations.json");
                 URLConnection con = url.openConnection();
                 InputStream in = con.getInputStream();
                 this.body = IOUtils.convertStreamToString(in);
                 String[] lines = this.body.split("~#%#~");
                 String serverListVersion = lines[0];
-                File vFile = new File(_activity.getApplicationContext().getFilesDir(),"tuxedo_server_version.txt");
+                File vFile = new File(_activity.getApplicationContext().getFilesDir(),"server_version.txt");
 
                 BufferedReader reader;
                 if(!update) {

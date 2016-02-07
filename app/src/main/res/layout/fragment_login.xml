@@ -3,13 +3,14 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/splash">
+    android:background="@drawable/login">
 
 
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:id="@+id/info"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
@@ -17,13 +18,20 @@
         />
 
 
+    <LinearLayout
+        android:id="@+id/login_void"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="50dp">
+    </LinearLayout>
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/skip_button"
-        android:layout_centerInParent="true"
+android:layout_centerHorizontal="true"
+        android:layout_above="@+id/login_void"
         />
 
     <Button
@@ -34,6 +42,7 @@
         android:textColor="#FFFFFF"
         android:textSize="12sp"
         android:layout_centerInParent="true"
+        android:layout_below="@+id/login_button"
         android:background="#00000000"
         android:onClick="skipLogin" />
 </RelativeLayout>
