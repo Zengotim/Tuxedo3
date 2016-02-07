@@ -3,6 +3,7 @@ package com.tk_squared.tuxedo3;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,9 @@ import android.widget.ProgressBar;
 //Millennial Media Ad Support
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.millennialmedia.InlineAd;
 import com.millennialmedia.MMException;
 import com.millennialmedia.MMSDK;
@@ -35,6 +39,13 @@ public class TuxedoActivity extends AppCompatActivity
         implements TuxedoActivityFragment.Callbacks, tkkDataMod.Callbacks, LoginFragment.Callbacks {
 
     //region Description: Variables and Accessors
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
     private tkkDataMod tuxData;
     public tkkDataMod getData() {
         return tuxData;
@@ -85,6 +96,10 @@ public class TuxedoActivity extends AppCompatActivity
 
         //Get data model
         tuxData = tkkDataMod.getInstance(this);
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
@@ -147,6 +162,38 @@ public class TuxedoActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW,
+                "Tuxedo Main Page",
+                Uri.parse("http://www.tk-squared.com/Tuxedo"),
+                Uri.parse("android-app://com.tk_squared.tuxedo3/http/www.tk-squared.com/Tuxedo")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW,
+                "Tuxedo Main Page",
+                Uri.parse("http://www.tk-squared.com/Tuxedo"),
+                Uri.parse("android-app://com.tk_squared.tuxedo3/http/www.tk-squared.com/Tuxedo")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
     }
     //endregion
 

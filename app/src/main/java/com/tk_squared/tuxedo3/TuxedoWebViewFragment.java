@@ -121,7 +121,7 @@ public class TuxedoWebViewFragment extends Fragment{
                         .setContentTitle(currentName)
                         .setContentDescription(description)
                         .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.tk_squared.tuxedo3"))
-                        .setImageUrl(Uri.parse("http://www.tk-squared.com/tux_banner.png"))
+                        .setImageUrl(Uri.parse("http://www.tk-squared.com/tux_icon.png"))
                         .build();
                 //Sharing callbacks
                 shareDialog.registerCallback(tuxedoActivity.getCallbackManager(), new FacebookCallback<Sharer.Result>() {
