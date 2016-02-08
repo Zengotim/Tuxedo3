@@ -11,6 +11,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.util.Base64;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import java.security.MessageDigest;
@@ -121,15 +122,15 @@ public class TuxedoActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        MenuInflater menuInflater = getMenuInflater();
         if (fragment instanceof TuxedoActivityFragment) {
-            getMenuInflater().inflate(R.menu.menu_tuxedo, menu);
+           menuInflater.inflate(R.menu.menu_tuxedo, menu);
             listEditEnabled = false;
             ((TuxedoActivityFragment) fragment)
                     .getListView()
                     .setRearrangeEnabled(listEditEnabled);
         } else if (fragment instanceof  TuxedoWebViewFragment) {
-            getMenuInflater().inflate(R.menu.menu_webview, menu);
-            //  ((TuxedoWebViewFragment) fragment).onShareStation();
+            menuInflater.inflate(R.menu.menu_webview, menu);
         }
         return true;
     }
@@ -275,7 +276,6 @@ public class TuxedoActivity extends AppCompatActivity
     //Callback method for TuxedoActivityFragment.Callbacks
     @Override
     public void onStationSelected(tkkStation station) {
-        //Change to WebView to view selected station
         displayWebView(station);
     }
 
@@ -371,11 +371,6 @@ public class TuxedoActivity extends AppCompatActivity
         try {
             // NOTE: The ad container argument passed to the createInstance call should be the
             // view container that the ad content will be injected into.
-
-            /*View adContainer = findViewById(R.id.ad_container);
-            if (adContainer == null){
-                adContainer = new ImageView(this);
-            }*/
             InlineAd inlineAd = InlineAd.createInstance(getString(R.string.mmedia_apid),
                                             (LinearLayout)findViewById(R.id.ad_container));
             final InlineAd.InlineAdMetadata inlineAdMetadata = new InlineAd.InlineAdMetadata().
