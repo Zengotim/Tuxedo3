@@ -116,12 +116,12 @@ public class TuxedoWebViewFragment extends Fragment{
         try {
             if (ShareDialog.canShow(ShareLinkContent.class)) {
                 //Create the post
-                String description = "Listen to " + currentName + " on Tuxedo!";
+                String description = "Listen to " + currentName + " on " + getString(R.string.app_name) + "!";
                 linkContent = new ShareLinkContent.Builder()
                         .setContentTitle(currentName)
                         .setContentDescription(description)
-                        .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.tk_squared.tuxedo3"))
-                        .setImageUrl(Uri.parse("http://www.tk-squared.com/tux_icon.png"))
+                        .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=" + getString(R.string.app_id_string)))
+                        .setImageUrl(Uri.parse(getString(R.string.app_icon_url)))
                         .build();
                 //Sharing callbacks
                 shareDialog.registerCallback(tuxedoActivity.getCallbackManager(), new FacebookCallback<Sharer.Result>() {

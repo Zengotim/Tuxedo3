@@ -22,7 +22,7 @@ public class LoginFragment extends Fragment {
     private Button skipButton;
     public Callbacks callbacks;
    // private CallbackManager callbackManager;
-    private TextView info;
+
 
     public interface Callbacks{
         void onLoginFinish();
@@ -52,9 +52,7 @@ public class LoginFragment extends Fragment {
         skipButton = (Button) view.findViewById(R.id.skip_button);
         if(skipButton == null) skipButton = new Button(getActivity());
 
-        info = (TextView)view.findViewById(R.id.info);
-        if(info == null) info = new TextView(getActivity());
-        info.setTextColor(Color.rgb(200, 0, 0));
+
 
         loginButton = (LoginButton)view.findViewById(R.id.login_button);
         loginButton.setReadPermissions("user_friends");
@@ -74,24 +72,17 @@ public class LoginFragment extends Fragment {
             public void onSuccess(LoginResult loginResult) {
                 Log.i("LOGIN", "Facebook logged in");
                 callbacks.onLoginFinish();
-                info.setText(
-                        "User ID: "
-                                + loginResult.getAccessToken().getUserId()
-                                + "\n" +
-                                "Auth Token: "
-                                + loginResult.getAccessToken().getToken()
-                );
+
             }
 
             @Override
             public void onCancel() {
-                info.setText("Login attempt canceled.");
+                Log.i("FB Cancel", "Canceled login");
             }
 
             @Override
             public void onError(FacebookException e) {
-
-                info.setText("Login attempt failed.");
+                Log.i("FacebookErr: ", e.toString());
             }
         });
         return view;
