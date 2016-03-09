@@ -8,8 +8,8 @@ android {
         applicationId "com.tk_squared.tuxedo3"
         minSdkVersion 16
         targetSdkVersion 23
-        versionName '1.1'
-        versionCode 5
+        versionName '1.3'
+        versionCode 7
         multiDexEnabled true
     }
     buildTypes {
@@ -18,7 +18,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    dexOptions{
+    dexOptions {
         preDexLibraries false
     }
     afterEvaluate {
@@ -31,6 +31,8 @@ android {
             dx.additionalParameters += '--multi-dex'
             dx.additionalParameters += "main-dex-list=$projectDir/<filename>".toString()
         }
+    }
+    productFlavors {
     }
 }
 

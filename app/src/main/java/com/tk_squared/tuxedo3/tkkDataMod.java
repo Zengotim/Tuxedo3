@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -69,7 +70,7 @@ public class tkkDataMod {
                 URL url = new URL("http://tk-squared.com/Tuxedo/stations.json");
                 URLConnection con = url.openConnection();
                 InputStream in = con.getInputStream();
-                this.body = IOUtils.convertStreamToString(in);
+                this.body = fileReader(in);
                 String[] lines = this.body.split("~#%#~");
                 String serverListVersion = lines[0];
                 File vFile = new File(_activity.getApplicationContext().getFilesDir(),"server_version.txt");
@@ -148,6 +149,17 @@ public class tkkDataMod {
 
         }
 
+        private String fileReader(InputStream inputStream) throws IOException {
+
+            BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder total = new StringBuilder();
+            String line;
+            while ((line = r.readLine()) != null) {
+                total.append(line);
+            }
+            return total.toString();
+        }
+
         private void updateListVersion(File vFile, String sVersion) {
             FileOutputStream writer;
             try {
@@ -188,6 +200,7 @@ public class tkkDataMod {
             }
             catch(MalformedURLException e){
                 Log.i("MalformedURLException", e.toString());
+                this.bitmap = BitmapFactory.decodeResource(_activity.getApplicationContext().getResources(), R.drawable.ic_launcher);
                 //do nothing
             }
             catch (IOException e){
@@ -203,7 +216,11 @@ public class tkkDataMod {
         }
 
         protected void onPostExecute(Integer result){
+            if(this.bitmap == null) {
 
+                Log.i(_activity.getString(R.string.app_name), "Icon is null. Using "+_activity.getString(R.string.app_name)+" icon for station: " + this.name);
+                this.bitmap = BitmapFactory.decodeResource(_activity.getApplicationContext().getResources(), R.drawable.ic_launcher);
+            }
             instance.stations.add(dataSource.createStation(this.name, this.uri, this.bitmap, _activity));
 
             if(++completes >= tasks) {
