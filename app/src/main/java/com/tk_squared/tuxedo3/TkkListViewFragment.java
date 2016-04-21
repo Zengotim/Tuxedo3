@@ -1,9 +1,10 @@
 package com.tk_squared.tuxedo3;
 
-
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,11 +17,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
 
-public class TuxedoActivityFragment extends Fragment implements RearrangeableListView.RearrangeListener{
+public class TkkListViewFragment extends Fragment implements RearrangeableListView.RearrangeListener{
 
-    //region Description: Variable and Interface declarations
+    //region Description: variables and Interface declarations
     private RearrangeableListView listView;
-        public RearrangeableListView getListView(){return listView;}
+    public RearrangeableListView getListView(){return listView;}
     private int position;
     private Callbacks callbacks;
 
@@ -29,10 +30,8 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
         void onStationSelected(tkkStation station);
     }
 
-    public TuxedoActivityFragment() {
-    }
+    public TkkListViewFragment() {}
     //endregion
-
 
     //region Desc: RearrangeableListView Listener interface methods
     @Override
@@ -45,7 +44,7 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
     public boolean onRearrangeRequested(int fromIndex, int toIndex) {
         //If data is valid, move it
         if (toIndex > 0 && toIndex < listView.getCount()) {
-            ((TuxedoActivity)getActivity()).getData().moveStation(fromIndex, toIndex);
+            ((TkkActivity)getActivity()).getData().moveStation(fromIndex, toIndex);
             ((ArrayAdapter) listView.getAdapter()).notifyDataSetChanged();
             position = -1;
             return true;
@@ -66,7 +65,7 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
     }
     //endregion
 
-    //region Description: Lifecycle and Super Override methods
+    //region Description: Lifecycle and Super Override
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -76,23 +75,23 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_tuxedo, container, false);
+        return inflater.inflate(R.layout.fragment_listview, container, false);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final TuxedoActivity tuxActivity = (TuxedoActivity)getActivity();
-        listView = (RearrangeableListView) getView().findViewById(R.id.list);
+        final TkkActivity tkkActivity = (TkkActivity)getActivity();
+        listView = (RearrangeableListView) getActivity().findViewById(R.id.list);
         if (listView == null){
             listView = new RearrangeableListView(getActivity());
         }
 
-        ArrayAdapter adapter = new StationAdapter(tuxActivity, tuxActivity.getTkkData());
+        ArrayAdapter adapter = new StationAdapter(tkkActivity, tkkActivity.getTkkData());
         listView.setAdapter(adapter);
-        listView.setRearrangeEnabled(((TuxedoActivity) getActivity()).getListEditEnabled());
+        listView.setRearrangeEnabled(((TkkActivity) getActivity()).getListEditEnabled());
         listView.setRearrangeListener(this);
-        callbacks = tuxActivity;
+        callbacks = tkkActivity;
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -103,18 +102,20 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
                 callbacks.onStationSelected(station);
             }
         });
-        Toolbar toolbar = (Toolbar) tuxActivity.findViewById(R.id.toolbar);
-        toolbar.setSubtitle(R.string.subtitle);
-        tuxActivity.setSupportActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) tkkActivity.findViewById(R.id.toolbar);
+        if (toolbar != null){
+            toolbar.setSubtitle(R.string.subtitle);
+        }
+        tkkActivity.setSupportActionBar(toolbar);
     }
     //endregion
 
     //Adapter class for the ListView
     public class StationAdapter extends ArrayAdapter<tkkStation>{
 
-        //region Description: Variables and Constructor
+        //region Description: variables and Constructor
         private boolean showDelete = true;
-            public void setShowDelete(boolean show){showDelete = show;}
+        public void setShowDelete(boolean show) {showDelete = show;}
 
         public StationAdapter(Context context, ArrayList<tkkStation> list){
             super(context, 0, list);
@@ -150,11 +151,32 @@ public class TuxedoActivityFragment extends Fragment implements RearrangeableLis
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((TuxedoActivity) getActivity()).getData().removeStationAt(position);
-                    notifyDataSetChanged();
+                    confirmDialog(position);
                 }
             });
             return view;
+        }
+
+        private void confirmDialog(final Integer position){
+            AlertDialog.Builder cDialog = new AlertDialog.Builder((getContext()));
+            cDialog
+                    .setMessage("delete " +
+                            ((TkkActivity) getActivity())
+                                    .getData().getStationAt(position).getName() + "?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog, int id){
+                            ((TkkActivity) getActivity()).getData().removeStationAt(position);
+                            ((ArrayAdapter)listView.getAdapter()).notifyDataSetChanged();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog, int id){
+                            //foregetaboutit
+                        }
+                    })
+                    .show();
         }
     }
 }

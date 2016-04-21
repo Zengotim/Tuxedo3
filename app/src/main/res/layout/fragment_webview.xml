@@ -20,15 +20,25 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout
+    <LinearLayout
+        android:baselineAligned="false"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".80"
-        android:paddingBottom="3dp"
-        android:background="@color/colorThemeBackground">
-        <WebView
-            android:id="@+id/webview_view"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_width="match_parent" />
-    </RelativeLayout>
+            android:layout_weight=".80"
+            android:paddingEnd="3dp"
+            android:paddingStart="3dp"
+            android:paddingRight="3dp"
+            android:background="@color/colorThemeBackground">
+            <WebView
+                android:id="@+id/webview_view"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent" />
+        </RelativeLayout>
+
+    </LinearLayout>
 </LinearLayout>
