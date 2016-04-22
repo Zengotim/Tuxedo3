@@ -22,13 +22,12 @@ package com.tk_squared.tuxedo3;
  * THE SOFTWARE.
  *
  */
-        import android.content.Context;
-        import android.graphics.Rect;
-        import android.util.AttributeSet;
-        import android.util.Log;
-        import android.view.MotionEvent;
-        import android.view.View;
-        import android.widget.ListView;
+import android.content.Context;
+import android.graphics.Rect;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ListView;
 
 public class RearrangeableListView extends ListView {
 
